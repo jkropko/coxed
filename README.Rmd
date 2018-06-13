@@ -14,11 +14,57 @@ knitr::opts_chunk$set(
 )
 ```
 
-# coxed
+# Duration-Based Quantities of Interest and Simulation Methods for the Cox Proportional Hazards Model
 
-The goal of coxed is to ...
+The Cox proportional hazards model (implemented in R with `coxph()` in the `survival` package or with `cph()` in the `rms` package) is one of the most frequently used estimators in duration (survival) analysis. Because it is estimated using only the observed durations' rank ordering, typical quantities of interest used to communicate results of the Cox model come from the hazard function (e.g., hazard ratios
+or percentage changes in the hazard rate). These quantities are substantively vague and difficult for many audiences of research to understand. 
 
-## Example
+The `coxed` package introduces a suite of methods to address these problems. The package allows researchers to calculate duration-based quantities from Cox model results, such as the expected duration (or survival time) given covariate values and marginal changes in duration for a specified change in a covariate. These duration-based quantities often match better with researchers' substantive interests and are
+easily understood by most readers.
+
+In addition, no standard method exists for simulating durations directly from the Cox model's data generating process because it does not assume a distributional form for the baseline hazard function. The `coxed` package also contains functions to simulate general duration data that does not rely on an assumption of any particular parametric hazard function.
+
+## Examples
+Please see our two vignettes: `coxed.Rmd` and `simulating_survival_data.Rmd` for detailed instructions with examples about how to use the `coxed()` and `sim.survdata()` functions.  
+```{r coxed, warning=FALSE, message=FALSE}
+library(coxed)
+```
+
+### A simple example of the `coxed()` function
+
+First we replicate the Cox model from Martin and Vanberg (2003):
+```{r coxmodel}
+mv.surv <- Surv(martinvanberg$formdur, event = rep(1, nrow(martinvanberg)))
+mv.cox <- coxph(mv.surv ~ postel + prevdef + cont + ident + rgovm + pgovno + 
+                     tpgovno + minority, method = "breslow", data = martinvanberg)
+summary(mv.cox)
+```
+To see predicted durations from the Cox model, place the Cox model output as the first argument of `coxed()`:
+```{r npsf1}
+ed1 <- coxed(mv.cox, method="npsf")
+```
+There are a number of uses of the `coxed()` output.  First, the predicted durations for each individual observation are stored in the `exp.dur` attribute:
+```{r npsfexpdur}
+head(ed1$exp.dur)
+```
+The `summary()` function, when applied to `coxed`, reports either the mean or median duration in the estimation sample, depending on the option specified with `stat`:
+```{r sumamrynpsf}
+summary(ed1, stat="mean")
+summary(ed1, stat="median")
+```
+The predicted mean duration of government negotiations is 25.18 days, and the predicted median duration is 19.12 days.
+
+In addition to reporting the mean and median duration, the NPSF version of `coxed()` provides estimates of the cumulative baseline hazard function and the baseline survivor function in the data. These functions are stored as a data frame in the `baseline.functions` attribute.
+```{r baselinefun}
+head(ed1$baseline.functions)
+```
+
+### Simulating a single dataset
+To generate a survival dataset, use the `sim.survdata()` function, with the `num.data.frames` argument set to 1. Here we generate a single survival dataset with 1000 observations, in which durations can fall on any integer between 1 and 100:
+```{r simsurv1}
+simdata <- sim.survdata(N=1000, T=100, num.data.frames=1)
+```
+
 
 This is a basic example which shows you how to solve a common problem:
 
