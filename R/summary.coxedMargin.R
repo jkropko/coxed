@@ -27,28 +27,36 @@
 #' @seealso \code{\link[coxed]{coxed}}
 #' @export
 #' @examples
-#' require(survival)
-#' require(dplyr)
 #' mv.surv <- Surv(martinvanberg$formdur, event = rep(1, nrow(martinvanberg)))
 #' mv.cox <- coxph(mv.surv ~ postel + prevdef + cont + ident + rgovm + pgovno + tpgovno +
 #'      minority, method = "breslow", data = martinvanberg)
 #' summary(mv.cox)
 #'
-#' me <- coxed(mv.cox, method="npsf", bootstrap = TRUE,
-#'             newdata = mutate(martinvanberg, rgovm=0),
-#'             newdata2 = mutate(martinvanberg, rgovm=1.24))
+#' me <- coxed(mv.cox, method="npsf", bootstrap = FALSE,
+#'             newdata = dplyr::mutate(martinvanberg, rgovm=0),
+#'             newdata2 = dplyr::mutate(martinvanberg, rgovm=1.24))
 #' summary(me, stat="mean")
 #' summary(me, stat="median")
 summary.coxedMargin <- function(object, stat="mean", ...) {
      stopifnot(inherits(object, "coxedMargin"))
      if(!(stat %in% c("mean", "median"))) stop("stat must be one of mean or median")
      if(stat=="mean"){
-          r <- rbind(object$mean2, object$mean1, object$mean.diff)
-          rownames(r) <- c("newdata2", "newdata", "difference")
+          if(is.null(object$mean1)){
+               r <- colMeans(object$exp.dur)
+               names(r) <- c("newdata2", "newdata", "difference")
+          } else{
+               r <- rbind(object$mean2, object$mean1, object$mean.diff)
+               rownames(r) <- c("newdata2", "newdata", "difference")
+          }
      }
      if(stat=="median"){
-          r <- rbind(object$median2, object$median1, object$median.diff)
-          rownames(r) <- c("newdata2", "newdata", "difference")
+          if(is.null(object$mean1)){
+               r <- apply(object$exp.dur, 2, median)
+               names(r) <- c("newdata2", "newdata", "difference")
+          } else {
+               r <- rbind(object$median2, object$median1, object$median.diff)
+               rownames(r) <- c("newdata2", "newdata", "difference")
+          }
      }
      r <- round(r, 3)
      return(r)

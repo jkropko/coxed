@@ -40,16 +40,14 @@ If \code{bootstrap=TRUE} in the call to \code{coxed} then a bootstrapped standar
 and confidence interval is reported for each of these quantities as well.
 }
 \examples{
-require(survival)
-require(dplyr)
 mv.surv <- Surv(martinvanberg$formdur, event = rep(1, nrow(martinvanberg)))
 mv.cox <- coxph(mv.surv ~ postel + prevdef + cont + ident + rgovm + pgovno + tpgovno +
      minority, method = "breslow", data = martinvanberg)
 summary(mv.cox)
 
-me <- coxed(mv.cox, method="npsf", bootstrap = TRUE,
-            newdata = mutate(martinvanberg, rgovm=0),
-            newdata2 = mutate(martinvanberg, rgovm=1.24))
+me <- coxed(mv.cox, method="npsf", bootstrap = FALSE,
+            newdata = dplyr::mutate(martinvanberg, rgovm=0),
+            newdata2 = dplyr::mutate(martinvanberg, rgovm=1.24))
 summary(me, stat="mean")
 summary(me, stat="median")
 }

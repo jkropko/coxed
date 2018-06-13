@@ -140,7 +140,6 @@ me <- coxed(mv.cox, method="npsf", bootstrap = TRUE,
             newdata = dplyr::mutate(martinvanberg, pgovno=1),
             newdata2 = dplyr::mutate(martinvanberg, pgovno=6))
 summary(me, stat="mean")
-summary(me, stat="median")
 
 # GAM method
 ed2 <- coxed(mv.cox, method="gam")
@@ -148,7 +147,6 @@ summary(ed2$gam.data)
 summary(ed2$gam.model)
 ed2$exp.dur
 summary(ed2, stat="mean")
-summary(ed2, stat="median")
 
 \dontrun{me <- coxed(mv.cox, method="gam", bootstrap = TRUE,
             newdata = dplyr::mutate(martinvanberg, pgovno=1),
@@ -156,10 +154,6 @@ summary(ed2, stat="median")
 summary(me, stat="mean")
 summary(me, stat="median")
 }
-
-#Comparing the predicted durations to the observed durations and to each other
-tester <- data.frame(y=martinvanberg$formdur, npsf=ed1$exp.dur$exp.dur, gam=ed2$exp.dur$exp.dur)
-cor(tester)
 
 #Plotting the GAM fit
 \dontrun{ggplot(ed2$gam.data, aes(x=rank.xb, y=y)) +
