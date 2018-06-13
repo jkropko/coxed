@@ -115,6 +115,7 @@
 #' @import rms
 #' @import mgcv
 #' @importFrom stats aggregate end glm.fit median naresid predict pt qnorm quantile rnorm runif sd start time ts
+#' @importFrom utils globalVariables
 #' @examples
 #' ## See the examples for coxed, sim.survdata, and survsim.plot
 #' @author Jonathan Kropko <jkropko@@virginia.edu> and Jeffrey J. Harden <jharden2@@nd.edu>
@@ -145,11 +146,5 @@
 #' Wood, S.N., N. Pya and B. Saefken (2016) Smoothing parameter and model selection for general smooth models (with discussion). \emph{Journal of the American Statistical Association} \strong{111}, 1548-1575
 #' \url{http://dx.doi.org/10.1080/01621459.2016.1180986}
 #' @docType package
-#' @aliases coxed.package
-#' @name coxed.package
-"_PACKAGE"
-utils::globalVariables(c("Event", "Fup", "Id", "RqFit", "Start", "Stop", "agreg.fit", "beta1", "bj.fit", "copy",
-                         "coxph.control", "coxph.fit", "cum.hazard", "duration", "failed", "failure.CDF",
-                         "failure.PDF", "gam", "gam_fit", "gam_fit_se", "hazard", "id", "lm.fit.qr.bare",
-                         "lm.pfit", "lrm.fit", "matxv", "one", "oos.loglik.Glm", "oos.loglik.cph", "oos.loglik.lrm",
-                         "oos.loglik.ols", "oos.loglik.psm", "row_number", "survivor", "survreg.fit2", "value", "y", "y1"))
+#' @name coxed-package
+NULL
