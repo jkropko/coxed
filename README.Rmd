@@ -66,8 +66,3 @@ simdata <- sim.survdata(N=1000, T=100, num.data.frames=1)
 ```
 
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-## basic example code
-```
