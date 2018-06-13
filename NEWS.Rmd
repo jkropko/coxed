@@ -16,4 +16,8 @@ knitr::opts_chunk$set(
 
 # coxed 0.1.0
 
-* initial release
+* initial release 6/13/2018
+
+# coxed 0.1.1
+
+* first working version, ready for extensions/debugging/meeting CRAN demands 6/13/2018
