@@ -1,0 +1,28 @@
+Package: coxed
+Type: Package
+Title: Duration-Based Quantities of Interest for the Cox Proportional Hazards Model
+Version: 0.1.0
+Depends: R (>= 2.13.0), 
+     rms,
+     survival,
+     mgcv
+Authors@R: c(
+    person("Kropko,", "Jonathan", email = "jkropko@virginia.edu", role = c("aut", "cre")),
+    person("Harden,", "Jeffrey J.", email = "jeff.harden@nd.edu", role = c("aut")))
+Description: Functions for generating, simulating, and visualizing expected
+    durations and marginal changes in duration from the Cox proportional hazards
+    model.
+License: GPL-2
+Encoding: UTF-8
+URL: https://github.com/jkropko/coxed
+LazyData: true
+Imports: PermAlgo,
+    dplyr,
+    tidyr,
+    ggplot2,
+    gridExtra,
+    utils
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
