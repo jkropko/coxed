@@ -112,16 +112,11 @@
 #' summary(ed1, stat="mean")
 #' summary(ed1, stat="median")
 #'
-#' ed1 <- coxed(mv.cox, method="npsf", bootstrap = TRUE)
+#' \dontrun{ed1 <- coxed(mv.cox, method="npsf", bootstrap = TRUE)
 #' ed1$exp.dur
 #' summary(ed1, stat="mean")
 #' summary(ed1, stat="median")
-#'
-#' me <- coxed(mv.cox, method="npsf", bootstrap = TRUE,
-#'             newdata = dplyr::mutate(martinvanberg, rgovm=0),
-#'             newdata2 = dplyr::mutate(martinvanberg, rgovm=1.24))
-#' summary(me, stat="mean")
-#' summary(me, stat="median")
+#' }
 #'
 #' me <- coxed(mv.cox, method="npsf", bootstrap = TRUE,
 #'             newdata = dplyr::mutate(martinvanberg, pgovno=1),
@@ -137,22 +132,12 @@
 #' summary(ed2, stat="mean")
 #' summary(ed2, stat="median")
 #'
-#' ed2 <- coxed(mv.cox, method="gam", bootstrap = TRUE)
-#' ed2$exp.dur
-#' summary(ed2, stat="mean")
-#' summary(ed2, stat="median")
-#'
-#' me <- coxed(mv.cox, method="gam", bootstrap = TRUE,
-#'             newdata = dplyr::mutate(martinvanberg, rgovm=0),
-#'             newdata2 = dplyr::mutate(martinvanberg, rgovm=1.24))
-#' summary(me, stat="mean")
-#' summary(me, stat="median")
-#'
-#' me <- coxed(mv.cox, method="gam", bootstrap = TRUE,
+#' \dontrun{me <- coxed(mv.cox, method="gam", bootstrap = TRUE,
 #'             newdata = dplyr::mutate(martinvanberg, pgovno=1),
 #'             newdata2 = dplyr::mutate(martinvanberg, pgovno=6))
 #' summary(me, stat="mean")
 #' summary(me, stat="median")
+#' }
 #'
 #' #Comparing the predicted durations to the observed durations and to each other
 #' tester <- data.frame(y=martinvanberg$formdur, npsf=ed1$exp.dur$exp.dur, gam=ed2$exp.dur$exp.dur)
@@ -173,7 +158,7 @@
 #' bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method = "breslow")
 #' summary(bs.cox)
 #'
-#' ed1 <- coxed(bs.cox, method="npsf", bootstrap = TRUE, id=boxsteffensmeier$caseid)
+#' ed1 <- coxed(bs.cox, method="npsf", id=boxsteffensmeier$caseid)
 #' ed1$exp.dur
 #' summary(ed1, stat="mean")
 

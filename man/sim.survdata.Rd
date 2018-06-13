@@ -123,7 +123,7 @@ standard deviation of 0.1, and these new coefficients are used to create a new l
 (100 x \code{censor}) percent of the linear predictors are designated as right-censored.
 }
 \examples{
-simdata <- sim.survdata(N=1000, T=100, num.data.frames=10)
+simdata <- sim.survdata(N=1000, T=100, num.data.frames=2)
 require(survival)
 data <- simdata[[1]]$data
 model <- coxph(Surv(y, failed) ~ X1 + X2 + X3, data=data)
@@ -138,11 +138,12 @@ dnorm((log(t) - log(50))/log(10)) /
 simdata <- sim.survdata(N=1000, T=100, hazard.fun = my.hazard)
 
 ## A simulated data set with time-varying covariates
-simdata <- sim.survdata(N=1000, T=100, type="tvc", xvars=5, num.data.frames=1)
+\dontrun{simdata <- sim.survdata(N=1000, T=100, type="tvc", xvars=5, num.data.frames=1)
 summary(simdata$data)
 model <- coxph(Surv(start, end, failed) ~ X1 + X2 + X3 + X4 + X5, data=simdata$data)
 model$coefficients ## model-estimated coefficients
 simdata$betas ## "true" coefficients
+}
 
 ## A simulated data set with time-varying coefficients
 simdata <- sim.survdata(N=1000, T=100, type="tvbeta", num.data.frames = 1)
