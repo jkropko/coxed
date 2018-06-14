@@ -76,20 +76,17 @@ simdata$ind.survive[1,]
 The last two attributes, `marg.effect` and `marg.effect.data`, are discussed further below.
 
 ## Simulating multiple datasets
-In a simulation, researchers generally want to create many iterations of simulated data to draw inferences from the sampling variation that produces each dataset.  To generate multiple datasets, set the `num.data.frames` argument to the desired number of iterations. For example, to create 10 datasets, type:
+In a simulation, researchers generally want to create many iterations of simulated data to draw inferences from the sampling variation that produces each dataset.  To generate multiple datasets, set the `num.data.frames` argument to the desired number of iterations. For example, to create 2 datasets, type:
 ```{r simsurv10, cache=TRUE}
-simdata <- sim.survdata(N=1000, T=100, num.data.frames=10)
+simdata <- sim.survdata(N=1000, T=100, num.data.frames=2)
 summary(simdata)
 ```
-The output is now a list of 10 objects, where each of the 10 objects contains another version of the attributes described above. For example, to the see the data for the third iteration, type
+The output is now a list of two objects, where each object contains another version of the attributes described above. For example, to the see the data for the second iteration, type
 ```{r data3}
-head(simdata[[3]]$data, 10)
+head(simdata[[2]]$data, 10)
 ```
-And to see the coefficients from the 5th and 7th iterations, type
-```{r coef57}
-simdata[[5]]$betas
-simdata[[7]]$betas
-```
+In the above example we created two datasets to reduce the time needed to compile this vignette, but for research applications this number can be set as large as a researcher wants, even to `num.data.frames=1000` for example. 
+
 ## Plotting the baseline functions and histograms
 The flexible-hazard method is designed to avoid assuming a particular parametric form for the hazard function, but it still employs a hazard function. To see the baseline functions, including hazard, use the `survsim.plot()` function.  The first argument is the output of the `sim.survdata()` function.  Every simulation iteration produces different durations (and if `fixed.hazard=FALSE`, different hazard functions), so it is necessary to use the `df` argument specify which simulation iteration to use when plotting histograms and baseline functions. To see the baseline functions for the first simulation iteration, specify `type="baseline"` as follows:
 ```{r plot1, fig.align="center", fig.width=6, fig.height=4}
@@ -165,28 +162,6 @@ simdata <- sim.survdata(N=1000, T=100, num.data.frames=2, fixed.hazard=TRUE)
 survsim.plot(simdata, df=1, type="baseline")
 survsim.plot(simdata, df=2, type="baseline")
 ```
----
-title: "How to simulate survival data with the `sim.survdata` function"
-author: "Jonathan Kropko and Jeffrey J. Harden"
-date: "`r Sys.Date()`"
-output: 
-     rmarkdown::html_vignette:
-          toc: TRUE
-          number_sections: TRUE
-vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-# Introduction
-Simulating data with known properties is an essential step in the development of new statistical methods.  Simulating survival data, however, is more challenging than most simulation tasks.  To describe this difficulty and our approach to overcoming it, we quote from Harden and Kropko (2018):
-
-> Typical methods for generating . . . durations often employ known distributions - such as the exponential, Weibull, or Gompertz — that imply specific shapes for the baseline hazard function. This approach is potentially problematic because it contradicts a key advantage of the Cox model — the ability to leave the distribution of the baseline hazard unspecified. By restricting the simulated data to a known (usually parametric) form, these studies impose an assumption that is not required in applications of the Cox model. In applied research, the baseline hazard in data can exhibit considerable heterogeneity, both across the many fields which employ the Cox model and within a given field . . . . Thus, simulating durations from one specific parametric distribution may not adequately approximate the data that many applied researchers analyze, reducing the simulation’s generalizability.
-
-> Here we address these problems by introducing a novel method for simulating durations without specifying a particular distribution for the baseline hazard function. Instead, the method generates — at each iteration of the simulation — a unique baseline hazard by fitting a cubic spline to randomly-drawn points. This produces a wide variety of shapes for the baseline hazard, including those that are unimodal, multimodal, monotonically increasing or decreasing, and other shapes. The method then generates a density function based on each baseline hazard and draws durations accordingly. Because the shape of the baseline hazard can vary considerably, this approach matches the Cox model’s inherent flexibility. By remaining agnostic about the distribution of the baseline hazard, our method better constructs the assumed data generating process (DGP) of the Cox model. Moreover, repeating this process over many iterations in a simulation yields more heterogeneity in the simulated samples of data, which matches the fact that applied researchers analyze a wide variety of data with the Cox model. This increases the generalizability of the simulation results.
-
-
 If `fixed.hazard=FALSE`, the two data frames yield different baseline functions:
 ```{r fixhaz2, fig.align="center", fig.width=6, fig.height=4}
 simdata <- sim.survdata(N=1000, T=100, num.data.frames=2, fixed.hazard=FALSE)
@@ -234,6 +209,7 @@ To generate survival data with 1000 observations, a maximum duration of 100, and
 simdata <- sim.survdata(N=1000, T=100, type="tvc", num.data.frames=1)
 head(simdata$data, 20)
 ```
+
 ## Time-varying coefficients
 The Cox model assumes proportional hazards, and one way to dispel this assumption is to allow the coefficients to vary over time. The `sim.survdata()` function generates data using time-varying coefficients if the `type="tvbeta"` argument is specified. If this option is specified, the first coefficient, whether coefficients are user-supplied or randomly generated, is interacted with the natural log of the time counter from 1 to `T` (the maximum possible duration). Durations are generated via proportional hazards, and coefficients are saved as a matrix to illustrate their dependence on time. To generate data with time-varying coefficients, type:
 ```{r tvbeta}
@@ -243,7 +219,7 @@ The coefficients are saved as a matrix with a column to represent time:
 ```{r tvbetamat}
 head(simdata$betas, 10)
 ```
-An alternative approach to specifying time-varying coefficients is for the user to supply the matrix of time-varying coefficients. With this approach the coefficient matrix must have the same number of rows as the maximum duration specified with `T`, which in this case is 100. Suppose that we specify three coefficients for three covariates, over the time frame from 1 to 100.  We want the first coefficient to be given by $$\beta_{1t} = (t - 25)^2/2500$$,
+An alternative approach to specifying time-varying coefficients is for the user to supply the matrix of time-varying coefficients. With this approach the coefficient matrix must have the same number of rows as the maximum duration specified with `T`, which in this case is 100. Suppose that we specify three coefficients for three covariates, over the time frame from 1 to 100.  We want the first coefficient to be given by $$\beta_{1_t} = \frac{(t - 25)^2}{2500},$$
 and the second and third coefficients to be given by .5 and -.25 respectively:
 ```{r makecoef}
 beta.mat <- data.frame(beta1 = (1:100 - 25)^2/2500,

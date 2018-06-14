@@ -118,7 +118,7 @@
 #' summary(ed1, stat="median")
 #' }
 #'
-#' me <- coxed(mv.cox, method="npsf", bootstrap = TRUE,
+#' me <- coxed(mv.cox, method="npsf", bootstrap = FALSE,
 #'             newdata = dplyr::mutate(martinvanberg, pgovno=1),
 #'             newdata2 = dplyr::mutate(martinvanberg, pgovno=6))
 #' summary(me, stat="mean")

@@ -5,15 +5,10 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs 
 
-There were 2 NOTEs:
+There was 1 NOTE:
 
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: '"Kropko, Jonathan" <jkropko@virginia.edu>'
 
-* checking examples ... NOTE
-Examples with CPU or elapsed time > 5s
-       user system elapsed
-coxed 7.651  0.261   8.004
-
 ## Submission history
-This is our first submission
+This is our second submission. We changed the examples to run in less than five seconds, and we changed the vignettes to compile in less than 2 minutes each.
