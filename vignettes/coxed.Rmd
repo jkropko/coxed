@@ -209,7 +209,7 @@ ggplot(ed2$gam.data, aes(x=rank.xb, y=y)) +
 
 
 # Comparing the predicted durations to the observed durations and to each other
-Given that `coxed()` contains two alternative methods for generating expected durations, it is possible to compare the estimates.  Both correlate positively but somewhat weakly with the observed durations, but the GAM and NPSF durations correlate strongly with each other.
+Given that `coxed()` contains two alternative methods for generating expected durations, it is possible to compare the estimates.  Both correlate positively the observed durations, and the GAM and NPSF durations correlate even more strongly with each other.
 ```{r tester}
 tester <- data.frame(y=martinvanberg$formdur, npsf=ed1$exp.dur$exp.dur, gam=ed2$exp.dur$exp.dur)
 cor(tester)
