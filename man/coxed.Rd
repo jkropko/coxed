@@ -43,7 +43,9 @@ abbreviated}
 \item{confidence}{If "studentized" (the default), bootstrapped CIs
 are calculated from the tails of a normal distribution where the mean and
 standard deviation are the point estimate and boostrapped SE of each duration
-estimate. If "empirical", bootstrapped confidence intervals are calculated empirically}
+estimate. If "empirical", bootstrapped confidence intervals are calculated empirically.
+If "bca", bootstrapped confidence intervals are calculated using the bias-correction
+and acceleration method described by DiCiccio and Efron (1996).}
 
 \item{level}{The level of the confidence interval to calculate (default is
 .95 for a 95 percent confidence interval)}
@@ -177,6 +179,9 @@ summary(ed1, stat="mean")
 \references{
 Kropko, J. and Harden, J. J. (2018). Beyond the Hazard Ratio: Generating Expected Durations from the
 Cox Proportional Hazards Model. \emph{British Journal of Political Science} \url{https://doi.org/10.1017/S000712341700045X}
+
+DiCiccio, T. J. and B. Efron. (1996). Bootstrap Confidence Intervals. \emph{Statistical Science}.
+11(3): 189–212. \url{https://doi.org/10.1214/ss/1032280214}
 }
 \seealso{
 \code{\link[survival]{coxph}}, \code{\link[rms]{cph}}, \code{\link[coxed]{bootcov2}},

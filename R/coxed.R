@@ -32,7 +32,9 @@
 #' @param confidence  If "studentized" (the default), bootstrapped CIs
 #' are calculated from the tails of a normal distribution where the mean and
 #' standard deviation are the point estimate and boostrapped SE of each duration
-#' estimate. If "empirical", bootstrapped confidence intervals are calculated empirically
+#' estimate. If "empirical", bootstrapped confidence intervals are calculated empirically.
+#' If "bca", bootstrapped confidence intervals are calculated using the bias-correction
+#' and acceleration method described by DiCiccio and Efron (1996).
 #' @param level The level of the confidence interval to calculate (default is
 #' .95 for a 95 percent confidence interval)
 #' @param id Cluster variable if bootstrapping is to be done by clusters of
@@ -94,6 +96,9 @@
 #' }
 #' @references Kropko, J. and Harden, J. J. (2018). Beyond the Hazard Ratio: Generating Expected Durations from the
 #' Cox Proportional Hazards Model. \emph{British Journal of Political Science} \url{https://doi.org/10.1017/S000712341700045X}
+#'
+#' DiCiccio, T. J. and B. Efron. (1996). Bootstrap Confidence Intervals. \emph{Statistical Science}.
+#' 11(3): 189–212. \url{https://doi.org/10.1214/ss/1032280214}
 #' @seealso \code{\link[survival]{coxph}}, \code{\link[rms]{cph}}, \code{\link[coxed]{bootcov2}},
 #' \code{\link[coxed]{coxed.gam}}, \code{\link[coxed]{coxed.gam.tvc}}, \code{\link[coxed]{coxed.npsf}},
 #' \code{\link[coxed]{coxed.npsf.tvc}}
@@ -164,7 +169,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      if(is.null(newdata) & !is.null(newdata2)) stop("newdata2 must only be specified if newdata is also specified")
      if(!method %in% c("gam", "npsf")) stop("method must be one of 'gam' and 'npsf'")
      if(!is.null(newdata2) & !all(dim(newdata)==dim(newdata2))) stop("newdata and newdata2 must have the same dimensions")
-     if(!confidence %in% c("studentized", "empirical")) stop("confidence must be one of 'studentized' and 'empirical'")
+     if(!confidence %in% c("studentized", "empirical", "bca")) stop("confidence must be one of 'studentized', 'empirical', or 'bca'")
      if(tvc & is.null(id)) stop("id must be filled in with the case ID if you have time-varying covariates.")
 
      #First data frame (newdata), or estimation sample if NULL
@@ -253,13 +258,25 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                     mean.ub <- quantile(mean.vec, level + (1-level)/2, names=FALSE)
                     median.lb <- quantile(median.vec, (1-level)/2, names=FALSE)
                     median.ub <- quantile(median.vec, level + (1-level)/2, names=FALSE)
-               } else {
+               } else if(confidence=="studentized"){
                     exp.dur.lb <- exp.dur$exp.dur + qnorm((1-level)/2)*exp.dur.se
                     exp.dur.ub <- exp.dur$exp.dur + qnorm(level + (1-level)/2)*exp.dur.se
                     mean.lb <- mean(exp.dur$exp.dur) + qnorm((1-level)/2)*mean.se
                     mean.ub <- mean(exp.dur$exp.dur) + qnorm(level + (1-level)/2)*mean.se
                     median.lb <- median(exp.dur$exp.dur) + qnorm((1-level)/2)*median.se
                     median.ub <- median(exp.dur$exp.dur) + qnorm(level + (1-level)/2)*median.se
+               } else if(confidence=="bca"){
+                    exp.dur.bca <- apply(exp.dur.mat, 1, FUN=function(x){
+                         bca(x, conf.level = level)
+                    })
+                    exp.dur.lb <- exp.dur.bca[1,]
+                    exp.dur.ub <- exp.dur.bca[2,]
+                    mean.bca <- bca(mean.vec, conf.level = level)
+                    mean.lb <- mean.bca[1]
+                    mean.ub <- mean.bca[2]
+                    median.bca <- bca(median.vec, conf.level = level)
+                    median.lb <- median.bca[1]
+                    median.ub <- median.bca[2]
                }
                res <- list(exp.dur = data.frame(exp.dur = exp.dur$exp.dur, bootstrap.se = exp.dur.se,
                                                 lb = exp.dur.lb, ub = exp.dur.ub),
@@ -352,7 +369,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                     mean.diff.ub <- quantile(mean.diff.vec, level + (1-level)/2, names=FALSE)
                     median.diff.lb <- quantile(median.diff.vec, (1-level)/2, names=FALSE)
                     median.diff.ub <- quantile(median.diff.vec, level + (1-level)/2, names=FALSE)
-               } else {
+               } else if(confidence=="studentized"){
                     exp.dur1.lb <- exp.dur[,1] + qnorm((1-level)/2)*exp.dur1.se
                     exp.dur1.ub <- exp.dur[,1] + qnorm(level + (1-level)/2)*exp.dur1.se
                     mean1.lb <- mean(exp.dur[,1]) + qnorm((1-level)/2)*mean1.se
@@ -371,6 +388,40 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                     mean.diff.ub <- mean(exp.dur[,3]) + qnorm(level + (1-level)/2)*mean.diff.se
                     median.diff.lb <- median(exp.dur[,3]) + qnorm((1-level)/2)*median.diff.se
                     median.diff.ub <- median(exp.dur[,3]) + qnorm(level + (1-level)/2)*median.diff.se
+               } else if(confidence=="bca"){
+                    exp.dur1.bca <- apply(exp.dur1.mat, 1, FUN=function(x){
+                         bca(x, conf.level = level)
+                    })
+                    exp.dur1.lb <- exp.dur1.bca[1,]
+                    exp.dur1.ub <- exp.dur1.bca[2,]
+                    mean1.bca <- bca(mean1.vec, conf.level = level)
+                    mean1.lb <- mean1.bca[1]
+                    mean1.ub <- mean1.bca[2]
+                    median1.bca <- bca(median1.vec, conf.level = level)
+                    median1.lb <- median1.bca[1]
+                    median1.ub <- median1.bca[2]
+                    exp.dur2.bca <- apply(exp.dur2.mat, 1, FUN=function(x){
+                         bca(x, conf.level = level)
+                    })
+                    exp.dur2.lb <- exp.dur2.bca[1,]
+                    exp.dur2.ub <- exp.dur2.bca[2,]
+                    mean2.bca <- bca(mean2.vec, conf.level = level)
+                    mean2.lb <- mean2.bca[1]
+                    mean2.ub <- mean2.bca[2]
+                    median2.bca <- bca(median2.vec, conf.level = level)
+                    median2.lb <- median2.bca[1]
+                    median2.ub <- median2.bca[2]
+                    diff.bca <- apply(diff.mat, 1, FUN=function(x){
+                         bca(x, conf.level = level)
+                    })
+                    diff.lb <- diff.bca[1,]
+                    diff.ub <- diff.bca[2,]
+                    mean.diff.bca <- bca(mean.diff.vec, conf.level = level)
+                    mean.diff.lb <- mean.diff.bca[1]
+                    mean.diff.ub <- mean.diff.bca[2]
+                    median.diff.bca <- bca(median.diff.vec, conf.level = level)
+                    median.diff.lb <- median.diff.bca[1]
+                    median.diff.ub <- median.diff.bca[2]
                }
                res <- list(exp.dur1 = data.frame(exp.dur = exp.dur[,1], bootstrap.se = exp.dur1.se,
                                                  lb = exp.dur1.lb, ub = exp.dur1.ub),
