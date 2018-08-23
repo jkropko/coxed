@@ -114,7 +114,7 @@
 #' @import survival
 #' @import rms
 #' @import mgcv
-#' @importFrom stats aggregate end glm.fit median naresid predict pt qnorm quantile rnorm runif sd start time ts
+#' @importFrom stats aggregate end glm.fit median naresid predict pt pnorm qnorm quantile rnorm runif sd start time ts
 #' @importFrom utils globalVariables
 #' @examples
 #' ## See the examples for coxed, sim.survdata, and survsim.plot
