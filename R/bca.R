@@ -1,7 +1,7 @@
 #' Bias-corrected and accelerated confidence intervals
 #'
 #' This function uses the method proposed by DiCiccio and Efron (1996)
-#' to generate confidence intervals that produce more accurate coverate
+#' to generate confidence intervals that produce more accurate coverage
 #' rates when the distribution of bootstrap draws is non-normal.
 #' This code is adapted from the \code{BC.CI()} function within the
 #' \code{\link[mediation]{mediate}} function in the \code{mediation} package.
