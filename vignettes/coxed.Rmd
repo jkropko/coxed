@@ -110,16 +110,16 @@ summary(ed1, stat="median")
 ```
 
 ## Out of sample prediction
-`coxed()` can be used to provide duration predictions for observations outside of the estimation sample.  Suppose that we observe five new cases and place them inside a new data frame:
+`coxed()` can be used to provide duration predictions for observations outside of the estimation sample.  Suppose that we observe three new cases and place them inside a new data frame:
 ```{r newdataframe}
-new.coalitions <- data.frame(postel = c(1,1,1,0,1),
-                             prevdef = c(0,0,1,1,0),
-                             cont = c(1,0,1,0,1),
-                             ident = c(1,2,2,3,3),
-                             rgovm = c(.3,.8, 1.1,.2,.35),
-                             pgovno = c(2,3,3,2,4),
-                             tpgovno = c(3.2,0,5,0,2.6),
-                             minority = c(0,0,1,0,0))
+new.coalitions <- data.frame(postel = c(1,0,0),
+                             prevdef = c(1,0,1),
+                             cont = c(1,0,0),
+                             ident = c(1,3,2),
+                             rgovm = c(0.81, 0.62, 1.18),
+                             pgovno = c(2,3,4),
+                             tpgovno = c(3.58, 5.17, 10.2),
+                             minority = c(0,0,1))
 new.coalitions
 ```
 To forecast durations for these cases along with standard errors and confidence intervals, we use the `coxed()` function and place `new.coalitions` into the `newdata` argument:
@@ -131,9 +131,9 @@ forecast$exp.dur
 ## Marginal changes in expected duration
 Here we use `coxed()` to provide answers to the two duration-based questions we posed in the introduction.  First consider "How much longer will negotiations take for an ideologically polarized coalition as compared to an ideologically homogeneous one?" To answer this question, we call `coxed()` and specify two new datasets, one in which `rgovm=0` indicating that all political parties in the governing coalition have the same ideological position, and one in which `rgovm=1.24`, indicating that the parties have very different ideological positions.  We use `mutate()` from the `dplyr` library to quickly create new data frames in which `rgovm` equals 0 or 1.24 for all cases, and set these two data frames as `newdata` and `newdata2` inside `coxed()`.   
 ```{r npsfme}
-me <- coxed(mv.cox, method="npsf", bootstrap = TRUE, B=30,
-            newdata = mutate(martinvanberg, rgovm=0),
-            newdata2 = mutate(martinvanberg, rgovm=1.24))
+me <- coxed(mv.cox, method = "gam", bootstrap = TRUE, B = 30,
+            newdata = dplyr::mutate(martinvanberg, rgovm = 0),
+            newdata2 = dplyr::mutate(martinvanberg, rgovm = 1.24))
 ```
 `coxed()` calculates expected durations for all cases under each new data frame and subtracts the durations for each case.  As an overall result, we can see either the mean or the median of these differences.
 ```{r npsfmesummary}

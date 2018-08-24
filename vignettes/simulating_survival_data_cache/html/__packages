@@ -9,3 +9,6 @@ rms
 nlme
 mgcv
 coxed
+dplyr
+tidyr
+bindrcpp

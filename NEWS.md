@@ -1,4 +1,9 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+coxed 0.2.1
+===========
+
+-   edited and rebuilt vignettes 8/24/2018
+
 coxed 0.2.0
 ===========
 
