@@ -1,4 +1,9 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+coxed 0.2.2
+===========
+
+-   fixed a bug with the TVC routines. All observations were being used to calculate cumulative baseline hazard for the NPSF function, resulting in a larger risk set, leading to lower hazard and longer durations than are correct. We fixed the bug by calculating the CBH from only the last observation of each unique value of ID
+
 coxed 0.2.1
 ===========
 
