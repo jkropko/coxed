@@ -49,37 +49,35 @@
 coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, cluster) {
 
      if(!is.null(coef)){
-          df <- data.frame(y1 = cox.model$y[b.ind,1],
-                           y2 = cox.model$y[b.ind,2],
-                           duration = cox.model$y[b.ind,2] - cox.model$y[b.ind,1],
-                           id = cluster[b.ind])
+          df <- data.frame(y = cox.model$y[b.ind,2], id = cluster[b.ind])
           df <- dplyr::group_by(df, id)
-          df <- dplyr::mutate(df, copy=row_number())
+          df <- dplyr::mutate(df, maxy = max(y))
           df <- dplyr::ungroup(df)
-          df <- dplyr::arrange(df, id, copy, y1)
-          df <- dplyr::group_by(df, id, copy)
-          df <- dplyr::mutate(df, duration = cumsum(duration))
-          df <- dplyr::ungroup(df)
-          y.bs <- df$duration
+          y.bs <- df$y
+          maxy <- df$maxy
           failed.bs <- cox.model$y[b.ind,3]
           cox.model$coefficients <- coef
      }
-     df <- data.frame(y1 = cox.model$y[,1],
-                      y2 = cox.model$y[,2],
-                      duration = cox.model$y[,2] - cox.model$y[,1],
-                      id = cluster)
-     df <- dplyr::arrange(df, id, y1)
+     df <- data.frame(y = cox.model$y[,2], id = cluster)
      df <- dplyr::group_by(df, id)
-     df <- dplyr::mutate(df, duration = cumsum(duration))
+     df <- dplyr::mutate(df, maxy = max(y))
      df <- dplyr::ungroup(df)
-     y <- df$duration
+     y <- df$y
+     maxy <- df$maxy
      failed <- cox.model$y[,3]
      exp.xb <- exp(predict(cox.model, type="lp"))
      if(!is.null(coef)) exp.xb <- exp.xb[b.ind]
 
      # Compile total failures (only non-censored) at each time point
-     if(!is.null(coef)) h <- cbind(y.bs, failed.bs, exp.xb)
-     if(is.null(coef)) h <- cbind(y, failed, exp.xb)
+     if(!is.null(coef)){
+          h <- cbind(y.bs, maxy, failed.bs, exp.xb)
+          h <- dplyr::filter(h, y.bs==maxy)
+     }
+     if(is.null(coef)){
+          h <- cbind(y, maxy, failed, exp.xb)
+          h <- dplyr::filter(h, y==maxy)
+     }
+     h <- dplyr::select(h, -maxy)
      h <- h[order(h[,1]),]
      h <- aggregate(h[,-1], by=list(h[,1]), FUN="sum")
      colnames(h) <- c("time", "total.failures", "exp.xb")
