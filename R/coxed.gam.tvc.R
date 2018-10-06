@@ -61,30 +61,21 @@ coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
                               coef=NULL, b.ind=NULL, warn=TRUE, cluster) {
 
      if(!is.null(coef)){
-          df <- data.frame(y1 = cox.model$y[b.ind,1],
-                           y2 = cox.model$y[b.ind,2],
-                           duration = cox.model$y[b.ind,2] - cox.model$y[b.ind,1],
-                           id = cluster[b.ind])
+          df <- data.frame(y = cox.model$y[b.ind,2], id = cluster[b.ind])
           df <- dplyr::group_by(df, id)
-          df <- dplyr::mutate(df, copy=row_number())
+          df <- dplyr::mutate(df, maxy = max(y))
           df <- dplyr::ungroup(df)
-          df <- dplyr::arrange(df, id, copy, y1)
-          df <- dplyr::group_by(df, id, copy)
-          df <- dplyr::mutate(df, duration = cumsum(duration))
-          df <- dplyr::ungroup(df)
-          y.bs <- df$duration
+          y.bs <- df$y
+          maxy <- df$maxy
           failed.bs <- cox.model$y[b.ind,3]
           cox.model$coefficients <- coef
      }
-     df <- data.frame(y1 = cox.model$y[,1],
-                      y2 = cox.model$y[,2],
-                      duration = cox.model$y[,2] - cox.model$y[,1],
-                      id = cluster)
-     df <- dplyr::arrange(df, id, y1)
+     df <- data.frame(y = cox.model$y[,2], id = cluster)
      df <- dplyr::group_by(df, id)
-     df <- dplyr::mutate(df, duration = cumsum(duration))
+     df <- dplyr::mutate(df, maxy = max(y))
      df <- dplyr::ungroup(df)
-     y <- df$duration
+     y <- df$y
+     maxy <- df$maxy
      failed <- cox.model$y[,3]
      exp.xb <- exp(predict(cox.model, type="lp"))
      if(!is.null(coef)) exp.xb.bs <- exp.xb[b.ind]
@@ -93,9 +84,9 @@ coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
 
      if(!is.null(coef)){
           gam.data.bs <- data.frame(y=y.bs, failed=failed.bs, rank.xb = rank(exp.xb.bs, ties.method = ties.method))
-          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data.bs, failed == 1))
+          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data.bs, failed == 1 & y.bs==maxy))
      } else {
-          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1))
+          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1 & y==maxy))
      }
 
      gam.data <- dplyr::mutate(gam.data,
