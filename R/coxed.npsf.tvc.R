@@ -70,11 +70,11 @@ coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, clust
 
      # Compile total failures (only non-censored) at each time point
      if(!is.null(coef)){
-          h <- cbind(y.bs, maxy, failed.bs, exp.xb)
+          h <- as.data.frame(cbind(y.bs, maxy, failed.bs, exp.xb))
           h <- dplyr::filter(h, y.bs==maxy)
      }
      if(is.null(coef)){
-          h <- cbind(y, maxy, failed, exp.xb)
+          h <- as.data.frame(cbind(y, maxy, failed, exp.xb))
           h <- dplyr::filter(h, y==maxy)
      }
      h <- dplyr::select(h, -maxy)
