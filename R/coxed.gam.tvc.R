@@ -66,7 +66,7 @@ coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
           df <- dplyr::mutate(df, maxy = max(y))
           df <- dplyr::ungroup(df)
           y.bs <- df$y
-          maxy <- df$maxy
+          maxy.bs <- df$maxy
           failed.bs <- cox.model$y[b.ind,3]
           cox.model$coefficients <- coef
      }
@@ -84,7 +84,7 @@ coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
 
      if(!is.null(coef)){
           gam.data.bs <- data.frame(y=y.bs, failed=failed.bs, rank.xb = rank(exp.xb.bs, ties.method = ties.method))
-          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data.bs, failed == 1 & y.bs==maxy))
+          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data.bs, failed == 1 & y.bs==maxy.bs))
      } else {
           gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1 & y==maxy))
      }

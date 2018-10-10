@@ -54,7 +54,7 @@ coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, clust
           df <- dplyr::mutate(df, maxy = max(y))
           df <- dplyr::ungroup(df)
           y.bs <- df$y
-          maxy <- df$maxy
+          maxy.bs <- df$maxy
           failed.bs <- cox.model$y[b.ind,3]
           cox.model$coefficients <- coef
      }
@@ -70,14 +70,15 @@ coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, clust
 
      # Compile total failures (only non-censored) at each time point
      if(!is.null(coef)){
-          h <- as.data.frame(cbind(y.bs, maxy, failed.bs, exp.xb))
-          h <- dplyr::filter(h, y.bs==maxy)
+          h <- as.data.frame(cbind(y.bs, maxy.bs, failed.bs, exp.xb))
+          h <- dplyr::filter(h, y.bs==maxy.bs)
+          h <- dplyr::select(h, -maxy.bs)
      }
      if(is.null(coef)){
           h <- as.data.frame(cbind(y, maxy, failed, exp.xb))
           h <- dplyr::filter(h, y==maxy)
+          h <- dplyr::select(h, -maxy)
      }
-     h <- dplyr::select(h, -maxy)
      h <- h[order(h[,1]),]
      h <- aggregate(h[,-1], by=list(h[,1]), FUN="sum")
      colnames(h) <- c("time", "total.failures", "exp.xb")
