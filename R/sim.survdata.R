@@ -144,6 +144,12 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
           if(type=="none" | type=="tvbeta") ifelse(censor.cond,
                                   data$failed <- !censor.x(xdata, censor=censor),
                                   data$failed <- !(runif(N) < censor))
+          if(!is.null(hazard.fun)){
+               data$failed[data$y==T] <- TRUE
+               r <- sum(data$y==T)
+               warning(paste(r, c("additional observations right-censored because the user-supplied hazard function
+                                  is nonzero at the latest timepoint. To avoid these extra censored observations, increase T")))
+          }
           return(list(data = data,
                       xdata = xdata,
                       baseline=baseline,
