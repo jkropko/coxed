@@ -191,9 +191,9 @@ my.hazard <- function(t){
           (log(10)*t*(1 - pnorm((log(t) - log(50))/log(10))))
      }
 ```
-We can then pass that function to `sim.survdata()`:
+We can then pass that function to `sim.survdata()`. Note that the lognormal hazard function does not equal 0 when `T=100`. That means that many observations will be naturally right-censored above and beyond the amount of right-censoring we've specified with the `censor` argument (a proportion of .1 by default), simply because we haven't allowed the simulated durations to extend to later time points. To reduce the number of additional right-censored observations, we increase `T` to 1000 to allow for the longer durations that the log-normal hazard function implies. Note, the `sim.survdata()` produces a warning with the number of additional right-censored observations:
 ```{r myhazsim}
-simdata <- sim.survdata(N=1000, T=100, num.data.frames=1, hazard.fun = my.hazard)
+simdata <- sim.survdata(N=1000, T=1000, num.data.frames=1, hazard.fun = my.hazard)
 ```
 To see the hazard, we can use the `simsurv.plot()` function with `type="baseline"`:
 ```{r myhazplot, fig.align="center", fig.width=6, fig.height=4}

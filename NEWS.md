@@ -1,4 +1,8 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+coxed 0.2.3
+===========
+-  fixed bug with user-supplied hazards. If the hazard does not equal 0 at the latest time point, some number of observations can be right-censored naturally. Previously, the bug set these observations to the earliest, not latest time point. The bug is corrected and a warning is supplied
+
 coxed 0.2.2
 ===========
 
