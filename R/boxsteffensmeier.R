@@ -17,7 +17,6 @@
 #' @source Box-Steffensmeier, J. M. (1996)
 #' A Dynamic Analysis of The Role of War Chests in Campaign Strategy.
 #' \emph{American Journal of Political Science} \strong{40} 352-371
-#' \url{https://doi.org/10.2307/2111628}
 "boxsteffensmeier"
 
 

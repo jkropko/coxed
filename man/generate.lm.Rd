@@ -4,8 +4,8 @@
 \alias{generate.lm}
 \title{Generate simulated durations using a baseline survivor function and proportional hazards}
 \usage{
-generate.lm(baseline, X = NULL, N = 1000, type = "none", beta = NULL,
-  xvars = 3, mu = 0, sd = 1, censor = 0.1)
+generate.lm(baseline, X = NULL, N = 1000, type = "none",
+  beta = NULL, xvars = 3, mu = 0, sd = 1, censor = 0.1)
 }
 \arguments{
 \item{baseline}{The baseline hazard, cumulative hazard, survival, failure PDF, and failure CDF as output by \code{\link[coxed]{baseline.build}}}

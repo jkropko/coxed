@@ -136,7 +136,6 @@ Durations from the Cox Proportional Hazards Model. \emph{British Journal of Poli
 Box-Steffensmeier, J. M. (1996)
 A Dynamic Analysis of The Role of War Chests in Campaign Strategy.
 \emph{American Journal of Political Science} \strong{40} 352-371
-\url{https://doi.org/10.2307/2111628}
 
 Hyman, J. M. (1983) Accurate monotonicity preserving cubic interpolation. \emph{SIAM J. Sci. Stat. Comput.} \strong{4}, 645–654.
 \url{https://doi.org/10.1137/0904045}

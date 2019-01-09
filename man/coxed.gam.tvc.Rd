@@ -4,8 +4,9 @@
 \alias{coxed.gam.tvc}
 \title{Predict expected durations using the GAM method with time-varying covariates}
 \usage{
-coxed.gam.tvc(cox.model, newdata = NULL, k = -1, ties.method = "random",
-  coef = NULL, b.ind = NULL, warn = TRUE, cluster)
+coxed.gam.tvc(cox.model, newdata = NULL, k = -1,
+  ties.method = "random", coef = NULL, b.ind = NULL, warn = TRUE,
+  cluster)
 }
 \arguments{
 \item{cox.model}{The output from a Cox proportional hazards model estimated

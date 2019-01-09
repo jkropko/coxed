@@ -4,8 +4,9 @@
 \alias{bootcov2}
 \title{Boostrapping algorithm for \code{coxed}}
 \usage{
-bootcov2(fit, cluster, B = 200, fitter, coef.reps = TRUE, loglik = FALSE,
-  pr = FALSE, maxit = 15, group = NULL, stat = NULL)
+bootcov2(fit, cluster, B = 200, fitter, coef.reps = TRUE,
+  loglik = FALSE, pr = FALSE, maxit = 15, group = NULL,
+  stat = NULL)
 }
 \arguments{
 \item{fit}{an estimated Cox proportional hazards model object with

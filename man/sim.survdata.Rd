@@ -5,10 +5,10 @@
 \title{Simulating duration data for the Cox proportional hazards model}
 \usage{
 sim.survdata(N = 1000, T = 100, type = "none", hazard.fun = NULL,
-  num.data.frames = 1, fixed.hazard = FALSE, knots = 8, spline = TRUE,
-  X = NULL, beta = NULL, xvars = 3, mu = 0, sd = 0.5, covariate = 1,
-  low = 0, high = 1, compare = median, censor = 0.1,
-  censor.cond = FALSE)
+  num.data.frames = 1, fixed.hazard = FALSE, knots = 8,
+  spline = TRUE, X = NULL, beta = NULL, xvars = 3, mu = 0,
+  sd = 0.5, covariate = 1, low = 0, high = 1, compare = median,
+  censor = 0.1, censor.cond = FALSE)
 }
 \arguments{
 \item{N}{Number of observations in each generated data frame. Ignored if \code{X} is not \code{NULL}}
