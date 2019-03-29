@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+# coxed 0.2.4
+
+* fixed typos in vignettes
+
 # coxed 0.2.3
 
 * fixed a bug with sim.survdata() with type="tvc" that prevented properly setting the amount of right-censoring

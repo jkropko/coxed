@@ -247,7 +247,7 @@ summary(me, stat="mean")
 summary(me, stat="median")
 
 ```
-An incumbent whose war chest is at the 75th percentile in the data delays the entry of a high quality challenger by 1.5 weeks, on average, compared to an incumbent whose war chest is at the 25th percentile.
+An incumbent whose war chest is at the 75th percentile in the data delays the entry of a high quality challenger by 2.7 weeks (or 2.4 weeks when evaluated at the medians), on average, compared to an incumbent whose war chest is at the 25th percentile.
 
 # References
 
