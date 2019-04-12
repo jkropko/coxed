@@ -46,10 +46,10 @@
 #'
 #' ed <- coxed.npsf.tvc(bs.cox, cluster=boxsteffensmeier$caseid)
 #' ed$exp.dur
-coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL) {
+coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, cluster) {
 
      if(!is.null(coef)){
-          df <- data.frame(y = cox.model$y[b.ind,2], id = c(1, cumsum(cox.model$y[b.ind,3])[-length(cox.model$y[b.ind,3])]+1))
+          df <- data.frame(y = cox.model$y[b.ind,2], id = cluster[b.ind])
           df <- dplyr::group_by(df, id)
           df <- dplyr::mutate(df, maxy = max(y))
           df <- dplyr::ungroup(df)
@@ -58,7 +58,7 @@ coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL) {
           failed.bs <- cox.model$y[b.ind,3]
           cox.model$coefficients <- coef
      }
-     df <- data.frame(y = cox.model$y[,2], id = c(1, cumsum(cox.model$y[,3])[-length(cox.model$y[,3])]+1))
+     df <- data.frame(y = cox.model$y[,2], id = cluster)
      df <- dplyr::group_by(df, id)
      df <- dplyr::mutate(df, maxy = max(y))
      df <- dplyr::ungroup(df)

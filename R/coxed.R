@@ -163,18 +163,19 @@
 
 coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, method="npsf",
                   k=-1, ties.method="random", B = 200, confidence="studentized",
-                  level=.95, ...){
+                  level=.95, id=NULL, ...){
 
      tvc <- (ncol(cox.model$y)==3)
      if(is.null(newdata) & !is.null(newdata2)) stop("newdata2 must only be specified if newdata is also specified")
      if(!method %in% c("gam", "npsf")) stop("method must be one of 'gam' and 'npsf'")
      if(!is.null(newdata2) & !all(dim(newdata)==dim(newdata2))) stop("newdata and newdata2 must have the same dimensions")
      if(!confidence %in% c("studentized", "empirical", "bca")) stop("confidence must be one of 'studentized', 'empirical', or 'bca'")
+     if(tvc & is.null(id)) stop("id must be filled in with the case ID if you have time-varying covariates.")
 
      #First data frame (newdata), or estimation sample if NULL
      if(method=="gam"){
           if(!tvc) dur1 <- coxed.gam(cox.model, newdata=newdata, k=k, ties.method=ties.method)
-          if(tvc) dur1 <- coxed.gam.tvc(cox.model, newdata=newdata, k=k, ties.method=ties.method)
+          if(tvc) dur1 <- coxed.gam.tvc(cox.model, newdata=newdata, k=k, ties.method=ties.method, cluster=id)
           dur1.pe <- dur1$exp.dur
           gam.model <- dur1$gam.model
           gam.data <- dur1$gam.data
@@ -184,7 +185,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      }
      if(method=="npsf"){
           if(!tvc) dur1 <- coxed.npsf(cox.model, newdata=newdata)
-          if(tvc) dur1 <- coxed.npsf.tvc(cox.model, newdata=newdata)
+          if(tvc) dur1 <- coxed.npsf.tvc(cox.model, newdata=newdata, cluster=id)
           dur1.pe <- dur1$exp.dur
           baseline.functions <- dur1$baseline.functions
      }
@@ -195,9 +196,9 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
           if(method=="gam" & !tvc) dur2.pe <- coxed.gam(cox.model, newdata=newdata2,
                                                                 k=k, ties.method=ties.method)$exp.dur
           if(method=="gam" & tvc) dur2.pe <- coxed.gam.tvc(cox.model, newdata=newdata2,
-                                                                   k=k, ties.method=ties.method)$exp.dur
+                                                                   k=k, ties.method=ties.method, cluster=id)$exp.dur
           if(method=="npsf" & !tvc) dur2.pe <- coxed.npsf(cox.model, newdata=newdata2)$exp.dur
-          if(method=="npsf" & tvc) dur2.pe <- coxed.npsf.tvc(cox.model, newdata=newdata2)$exp.dur
+          if(method=="npsf" & tvc) dur2.pe <- coxed.npsf.tvc(cox.model, newdata=newdata2, cluster=id)$exp.dur
           diff <- dur2.pe - dur1.pe
           exp.dur <- data.frame(exp.dur1 = dur1.pe, exp.dur2=dur2.pe, difference=diff)
      }
@@ -221,7 +222,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                                                        model.matrix(cox.model),
                                                x = TRUE, y = TRUE)
                class(boot.cph) <- "tvc"
-               boot.model <- bootcov2(boot.cph, B = B, cluster=c(1, cumsum(cox.model$y[,3])[-length(cox.model$y[,3])]+1), ...)
+               boot.model <- bootcov2(boot.cph, B = B, cluster=id, ...)
           }
           bs.coef <- boot.model$boot.Coef
           bs.obs <- boot.model$b.ind
@@ -233,12 +234,12 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                                                                           k=k, ties.method=ties.method,
                                                                           coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="gam" & tvc) dur1.pe <- coxed.gam.tvc(cox.model, newdata=newdata, warn=FALSE,
-                                                                          k=k, ties.method=ties.method,
+                                                                          k=k, ties.method=ties.method, cluster=id,
                                                                           coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="npsf" & !tvc) dur1.pe <- coxed.npsf(cox.model, newdata=newdata,
                                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="npsf" & tvc) dur1.pe <- coxed.npsf.tvc(cox.model, newdata=newdata,
-                                                                     coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                                     coef=bs.coef[i,], b.ind=bs.obs[,i], cluster=id)$exp.dur
                     exp.dur.mat[,i] <- dur1.pe
                }
                exp.dur.se <- apply(exp.dur.mat, 1, sd)
@@ -301,10 +302,10 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                          warn <- (i==1)
                          dur1.pe <- coxed.gam.tvc(cox.model, newdata=newdata,
                                                       k=k, ties.method=ties.method, warn=warn,
-                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                      coef=bs.coef[i,], b.ind=bs.obs[,i], cluster=id)$exp.dur
                          dur2.pe <- coxed.gam.tvc(cox.model, newdata=newdata2,
                                                       k=k, ties.method=ties.method, warn=warn,
-                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                      coef=bs.coef[i,], b.ind=bs.obs[,i], cluster=id)$exp.dur
                     }
                     if(method=="npsf" & !tvc){
                          dur1.pe <- coxed.npsf(cox.model, newdata=newdata,
@@ -314,9 +315,9 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                     }
                     if(method=="npsf" & tvc){
                          dur1.pe <- coxed.npsf.tvc(cox.model, newdata=newdata,
-                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                       coef=bs.coef[i,], b.ind=bs.obs[,i], cluster=id)$exp.dur
                          dur2.pe <- coxed.npsf.tvc(cox.model, newdata=newdata2,
-                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                       coef=bs.coef[i,], b.ind=bs.obs[,i], cluster=id)$exp.dur
                     }
                     exp.dur1.mat[,i] <- dur1.pe
                     exp.dur2.mat[,i] <- dur2.pe
