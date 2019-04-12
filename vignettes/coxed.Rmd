@@ -241,8 +241,7 @@ Here we look directly at the effect of the war chest on the length of time until
 ```{r tvcme}
 me <- coxed(bs.cox, method="npsf",
             newdata = mutate(boxsteffensmeier, ec=quantile(ec, .25)),
-            newdata2 = mutate(boxsteffensmeier, ec=quantile(ec, .75)),
-            id=boxsteffensmeier$caseid)
+            newdata2 = mutate(boxsteffensmeier, ec=quantile(ec, .75)))
 summary(me, stat="mean")
 summary(me, stat="median")
 
