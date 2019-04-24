@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+# coxed 0.2.5
+
+* fixed a bug in cox.gam.tvc.R and cox.npsf.tvc.R in which the functions failed to produce out of sample predictions
+
 # coxed 0.2.4
 
 * fixed typos in vignettes

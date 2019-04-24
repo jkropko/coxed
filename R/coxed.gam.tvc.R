@@ -20,10 +20,6 @@
 #' @param b.ind A vector of observation numbers to pass to the estimation sample to construct
 #' the a bootstrapped sample with replacement
 #' @param warn If \code{TRUE}, displays warnings, and if \code{FALSE} suppresses them
-#' @param cluster Cluster variable if bootstrapping is to be done by clusters of
-#' observations rather than individual observations. This must be filled in with
-#' the case ID if the data are coded with time-varying covariates (using the \code{time2}
-#' argument in the \code{\link[survival]{Surv}} function)
 #' @return Returns a list containing the following components:
 #' \tabular{ll}{
 #' \code{exp.dur} \tab A vector of predicted mean durations for the estimation sample
@@ -36,13 +32,9 @@
 #' in Kropko and Harden (2018). See \code{\link[coxed]{coxed.gam}} for details.  This code
 #' replicates the code for \code{cox.gam}, but works with data whose structure allows time-varying
 #' covariates, and requires using the \code{time2} argument of the \code{\link[survival]{Surv}} function.
-#' This function rearranges the data so that the time intervals are reported as cumulative durations.
-#' For instance, suppose that one observation is observed over three time periods, and thus takes up
-#' three rows in the data. On the first row time1=1, time2=4, and event=0; on the second row time1=5,
-#' time2=10, and event=0; and on the third row time1=11, time2=13, and event=1. The data are manipulated
-#' so that the first row contains duration=3 and event=0, the second row contains duration=10 and event=0,
-#' and the third row contains duration=13 and event=1. Then the GAM model is fit using the non-censored
-#' observations, and expected durations are drawn from this GAM as with \code{\link[coxed]{coxed.gam}}.
+#' This function requires the data to be reported as cumulative durations. The GAM model is fit using
+#' the ending times for each interval and using only the non-censored observations. Expected durations
+#' are drawn from this GAM as with \code{\link[coxed]{coxed.gam}}.
 #' @export
 #' @seealso \code{\link[mgcv]{gam}}, \code{\link[coxed]{coxed}}, \code{\link[coxed]{coxed.gam}}
 #' @references Kropko, J. and Harden, J. J. (2018). Beyond the Hazard Ratio: Generating Expected
@@ -55,39 +47,21 @@
 #' bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method = "breslow")
 #' summary(bs.cox)
 #'
-#' ed <- coxed.gam.tvc(bs.cox, cluster=boxsteffensmeier$caseid)
+#' ed <- coxed.gam.tvc(bs.cox)
 #' ed$exp.dur
 coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
-                              coef=NULL, b.ind=NULL, warn=TRUE, cluster) {
+                              coef=NULL, b.ind=NULL, warn=TRUE) {
 
-     if(!is.null(coef)){
-          df <- data.frame(y = cox.model$y[b.ind,2], id = cluster[b.ind])
-          df <- dplyr::group_by(df, id)
-          df <- dplyr::mutate(df, maxy = max(y))
-          df <- dplyr::ungroup(df)
-          y.bs <- df$y
-          #maxy.bs <- df$maxy
-          failed.bs <- cox.model$y[b.ind,3]
-          cox.model$coefficients <- coef
-     }
-     df <- data.frame(y = cox.model$y[,2], id = cluster)
-     df <- dplyr::group_by(df, id)
-     df <- dplyr::mutate(df, maxy = max(y))
-     df <- dplyr::ungroup(df)
-     y <- df$y
-     maxy <- df$maxy
-     failed <- cox.model$y[,3]
      exp.xb <- exp(predict(cox.model, type="lp"))
-     if(!is.null(coef)) exp.xb.bs <- exp.xb[b.ind]
 
-     gam.data <- data.frame(y=y, failed=failed, rank.xb = rank(exp.xb, ties.method = ties.method))
+     if(is.null(coef)) gam.data <- data.frame(y=cox.model$y[,2],
+                                              failed=cox.model$y[,3],
+                                              rank.xb = rank(exp.xb, ties.method = ties.method))
+     if(!is.null(coef)) gam.data <- data.frame(y=cox.model$y[b.ind,2],
+                                               failed=cox.model$y[b.ind,3],
+                                               rank.xb = rank(exp.xb[b.ind], ties.method = ties.method))
 
-     if(!is.null(coef)){
-          gam.data.bs <- data.frame(y=y.bs, failed=failed.bs, rank.xb = rank(exp.xb.bs, ties.method = ties.method))
-          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data.bs, failed == 1 & y.bs==maxy.bs))
-     } else {
-          gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1 & y==maxy))
-     }
+     gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1))
 
      gam.data <- dplyr::mutate(gam.data,
                         rank.y = rank(y, ties.method = ties.method),

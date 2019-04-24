@@ -46,39 +46,19 @@
 #'
 #' ed <- coxed.npsf.tvc(bs.cox, cluster=boxsteffensmeier$caseid)
 #' ed$exp.dur
-coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, cluster) {
+coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL) {
 
-     if(!is.null(coef)){
-          df <- data.frame(y = cox.model$y[b.ind,2], id = cluster[b.ind])
-          df <- dplyr::group_by(df, id)
-          df <- dplyr::mutate(df, maxy = max(y))
-          df <- dplyr::ungroup(df)
-          y.bs <- df$y
-          maxy.bs <- df$maxy
-          failed.bs <- cox.model$y[b.ind,3]
-          cox.model$coefficients <- coef
-     }
-     df <- data.frame(y = cox.model$y[,2], id = cluster)
-     df <- dplyr::group_by(df, id)
-     df <- dplyr::mutate(df, maxy = max(y))
-     df <- dplyr::ungroup(df)
-     y <- df$y
-     maxy <- df$maxy
+     y <- cox.model$y[,2]
      failed <- cox.model$y[,3]
      exp.xb <- exp(predict(cox.model, type="lp"))
-     if(!is.null(coef)) exp.xb <- exp.xb[b.ind]
+     if(!is.null(coef)){
+          y <- y[b.ind]
+          failed <- failed[b.ind]
+          exp.xb <- exp.xb[b.ind]
+     }
 
      # Compile total failures (only non-censored) at each time point
-     if(!is.null(coef)){
-          h <- as.data.frame(cbind(y.bs, maxy.bs, failed.bs, exp.xb))
-          h <- dplyr::filter(h, y.bs==maxy.bs)
-          h <- dplyr::select(h, -maxy.bs)
-     }
-     if(is.null(coef)){
-          h <- as.data.frame(cbind(y, maxy, failed, exp.xb))
-          h <- dplyr::filter(h, y==maxy)
-          h <- dplyr::select(h, -maxy)
-     }
+     h <- as.data.frame(cbind(y, failed, exp.xb))
      h <- h[order(h[,1]),]
      h <- aggregate(h[,-1], by=list(h[,1]), FUN="sum")
      colnames(h) <- c("time", "total.failures", "exp.xb")
@@ -91,13 +71,9 @@ coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL, clust
      S.bl <- exp(-CBH)
      baseline.functions <- data.frame(time = h$time, cbh = CBH, survivor = S.bl)
 
-     if(!is.null(newdata)){
-          exp.xb <- exp(predict(cox.model, newdata=newdata, type="lp"))
-     } else{
-          exp.xb <- exp(predict(cox.model, type="lp"))
-     }
+     if(!is.null(newdata)) exp.xb <- exp(predict(cox.model, newdata=newdata, type="lp"))
 
-     #Generate EDs for all in-sample observations
+     #Generate EDs for all observations in exp.xb
      survival <- t(sapply(exp.xb, FUN=function(x){S.bl^x}, simplify=TRUE))
      expect.duration <- apply(survival, 1, FUN=function(x){
           sum(diff(h[,1])*x[-1])
