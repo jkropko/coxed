@@ -66,7 +66,7 @@ coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
           df <- dplyr::mutate(df, maxy = max(y))
           df <- dplyr::ungroup(df)
           y.bs <- df$y
-          maxy.bs <- df$maxy
+          #maxy.bs <- df$maxy
           failed.bs <- cox.model$y[b.ind,3]
           cox.model$coefficients <- coef
      }
