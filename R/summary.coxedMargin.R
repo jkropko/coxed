@@ -42,7 +42,7 @@ summary.coxedMargin <- function(object, stat="mean", ...) {
      if(!(stat %in% c("mean", "median"))) stop("stat must be one of mean or median")
      if(stat=="mean"){
           if(is.null(object$mean1)){
-               r <- colMeans(object$exp.dur)
+               r <- colMeans(object$exp.dur, na.rm=TRUE)
                names(r) <- c("newdata2", "newdata", "difference")
           } else{
                r <- rbind(object$mean2, object$mean1, object$mean.diff)
@@ -51,7 +51,9 @@ summary.coxedMargin <- function(object, stat="mean", ...) {
      }
      if(stat=="median"){
           if(is.null(object$mean1)){
-               r <- apply(object$exp.dur, 2, median)
+               r <- apply(object$exp.dur, 2, FUN=function(x){
+                    median(x, na.rm=TRUE)
+               })
                names(r) <- c("newdata2", "newdata", "difference")
           } else {
                r <- rbind(object$median2, object$median1, object$median.diff)
