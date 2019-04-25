@@ -6,8 +6,8 @@
 Cox proportional hazards model}
 \usage{
 coxed(cox.model, newdata = NULL, newdata2 = NULL, bootstrap = FALSE,
-  method = "npsf", k = -1, ties.method = "random", B = 200,
-  confidence = "studentized", level = 0.95, id = NULL, ...)
+  method = "npsf", k = -1, B = 200, confidence = "studentized",
+  level = 0.95, id = NULL, ...)
 }
 \arguments{
 \item{cox.model}{The output from a Cox proportional hazards model estimated
@@ -33,10 +33,6 @@ the non-parametric step function approach described in Kropko and Harden
 \item{k}{The number of knots in the GAM smoother. The default is -1, which
 employs the \code{\link[mgcv]{choose.k}} function from the \code{\link{mgcv}} package
 to choose the number of knots}
-
-\item{ties.method}{A character string specifying how ties are treated,
-see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-abbreviated}
 
 \item{B}{Number of bootstrap simulation iterations}
 
@@ -172,7 +168,7 @@ bs.surv <- Surv(time = boxsteffensmeier$start, time2 = boxsteffensmeier$te,
 bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method = "breslow")
 summary(bs.cox)
 
-ed1 <- coxed(bs.cox, method="npsf", id=boxsteffensmeier$caseid)
+ed1 <- coxed(bs.cox, method="npsf")
 ed1$exp.dur
 summary(ed1, stat="mean")
 }

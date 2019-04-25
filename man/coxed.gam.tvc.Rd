@@ -4,9 +4,8 @@
 \alias{coxed.gam.tvc}
 \title{Predict expected durations using the GAM method with time-varying covariates}
 \usage{
-coxed.gam.tvc(cox.model, newdata = NULL, k = -1,
-  ties.method = "random", coef = NULL, b.ind = NULL, warn = TRUE,
-  cluster)
+coxed.gam.tvc(cox.model, newdata = NULL, k = -1, coef = NULL,
+  b.ind = NULL, warn = TRUE)
 }
 \arguments{
 \item{cox.model}{The output from a Cox proportional hazards model estimated
@@ -21,10 +20,6 @@ which to predict. If omitted, the fitted values are used}
 employs the \code{\link[mgcv]{choose.k}} function from the \code{\link{mgcv}} package
 to choose the number of knots}
 
-\item{ties.method}{A character string specifying how ties are treated,
-see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-abbreviated}
-
 \item{coef}{A vector of new coefficients to replace the \code{coefficients} attribute
 of the \code{cox.model}. Used primarily for bootstrapping, to recalculate durations
 using new coefficients derived from a bootstrapped sample.
@@ -34,11 +29,6 @@ If \code{NULL}, the original coefficients are employed}
 the a bootstrapped sample with replacement}
 
 \item{warn}{If \code{TRUE}, displays warnings, and if \code{FALSE} suppresses them}
-
-\item{cluster}{Cluster variable if bootstrapping is to be done by clusters of
-observations rather than individual observations. This must be filled in with
-the case ID if the data are coded with time-varying covariates (using the \code{time2}
-argument in the \code{\link[survival]{Surv}} function)}
 }
 \value{
 Returns a list containing the following components:
@@ -58,13 +48,9 @@ This function employs the GAM method of generating expected durations described
 in Kropko and Harden (2018). See \code{\link[coxed]{coxed.gam}} for details.  This code
 replicates the code for \code{cox.gam}, but works with data whose structure allows time-varying
 covariates, and requires using the \code{time2} argument of the \code{\link[survival]{Surv}} function.
-This function rearranges the data so that the time intervals are reported as cumulative durations.
-For instance, suppose that one observation is observed over three time periods, and thus takes up
-three rows in the data. On the first row time1=1, time2=4, and event=0; on the second row time1=5,
-time2=10, and event=0; and on the third row time1=11, time2=13, and event=1. The data are manipulated
-so that the first row contains duration=3 and event=0, the second row contains duration=10 and event=0,
-and the third row contains duration=13 and event=1. Then the GAM model is fit using the non-censored
-observations, and expected durations are drawn from this GAM as with \code{\link[coxed]{coxed.gam}}.
+This function requires the data to be reported as cumulative durations. The GAM model is fit using
+the ending times for each interval and using only the non-censored observations. Expected durations
+are drawn from this GAM as with \code{\link[coxed]{coxed.gam}}.
 }
 \examples{
 bs.surv <- Surv(time = boxsteffensmeier$start, time2 = boxsteffensmeier$te,
@@ -72,7 +58,7 @@ bs.surv <- Surv(time = boxsteffensmeier$start, time2 = boxsteffensmeier$te,
 bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method = "breslow")
 summary(bs.cox)
 
-ed <- coxed.gam.tvc(bs.cox, cluster=boxsteffensmeier$caseid)
+ed <- coxed.gam.tvc(bs.cox)
 ed$exp.dur
 }
 \references{

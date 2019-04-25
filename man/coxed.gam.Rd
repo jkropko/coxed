@@ -4,8 +4,8 @@
 \alias{coxed.gam}
 \title{Predict expected durations using the GAM method}
 \usage{
-coxed.gam(cox.model, newdata = NULL, k = -1, ties.method = "random",
-  coef = NULL, b.ind = NULL, warn = TRUE)
+coxed.gam(cox.model, newdata = NULL, k = -1, coef = NULL,
+  b.ind = NULL, warn = TRUE)
 }
 \arguments{
 \item{cox.model}{The output from a Cox proportional hazards model estimated
@@ -19,10 +19,6 @@ which to predict. If omitted, the fitted values are used}
 \item{k}{The number of knots in the GAM smoother. The default is -1, which
 employs the \code{\link[mgcv]{choose.k}} function from the \code{\link{mgcv}} package
 to choose the number of knots}
-
-\item{ties.method}{A character string specifying how ties are treated,
-see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-abbreviated}
 
 \item{coef}{A vector of new coefficients to replace the \code{coefficients} attribute
 of the \code{cox.model}. Used primarily for bootstrapping, to recalculate durations

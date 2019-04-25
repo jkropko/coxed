@@ -46,15 +46,15 @@ rank.predict <- function(x, v, warn=TRUE){
      d <- d[order(as.numeric(d[,4])),]
      d[is.na(d[,2]),1] <- NA
      r <- as.numeric(d[,1])
-     c1 <- sum(r==1)
-     c2 <- sum(r > length(v))
+     c1 <- sum(r==1, na.rm=TRUE)
+     c2 <- sum(r > length(v), na.rm = TRUE)
      paste1 <- paste(c("New data contain", c1,
                        "observations with linear predictors less than or equal to all linear predictors in the estimation sample. These observations will all have the same predicted duration"),
                      collapse=" ")
      paste2 <- paste(c("New data contain", c2,
                        "observations with linear predictors greater than or equal to all linear predictors in the estimation sample. These observations will all have the same predicted duration"),
                      collapse=" ")
-     if(warn & min(r)==1) warning(paste1)
-     if(warn & max(r)>length(v)) warning(paste2)
+     if(warn & min(r, na.rm=TRUE)==1) warning(paste1)
+     if(warn & max(r, na.rm=TRUE)>length(v)) warning(paste2)
      return(r)
 }

@@ -4,8 +4,7 @@
 \alias{coxed.npsf.tvc}
 \title{Predict expected durations using the GAM method with time-varying covariates}
 \usage{
-coxed.npsf.tvc(cox.model, newdata = NULL, coef = NULL, b.ind = NULL,
-  cluster)
+coxed.npsf.tvc(cox.model, newdata = NULL, coef = NULL, b.ind = NULL)
 }
 \arguments{
 \item{cox.model}{The output from a Cox proportional hazards model estimated
@@ -23,10 +22,6 @@ If \code{NULL}, the original coefficients are employed}
 
 \item{b.ind}{A vector of observation numbers to pass to the estimation sample to construct
 the a bootstrapped sample with replacement}
-
-\item{cluster}{Cluster variable if bootstrapping is to be done by clusters of
-observations rather than individual observations. This must be filled in with
-the case ID if the data are coded with time-varying covariates (using the \code{time2}}
 }
 \value{
 Returns a list containing the following components:
@@ -44,20 +39,16 @@ This function employs the NPSF method of generating expected durations described
 in Kropko and Harden (2018). See \code{\link[coxed]{coxed.npsf}} for details.  This code
 replicates the code for \code{cox.npsf}, but works with data whose structure allows time-varying
 covariates, and requires using the \code{time2} argument of the \code{\link[survival]{Surv}} function.
-This function rearranges the data so that the time intervals are reported as cumulative durations.
-For instance, suppose that one observation is observed over three time periods, and thus takes up
-three rows in the data. On the first row time1=1, time2=4, and event=0; on the second row time1=5,
-time2=10, and event=0; and on the third row time1=11, time2=13, and event=1. The data are manipulated
-so that the first row contains duration=3 and event=0, the second row contains duration=10 and event=0,
-and the third row contains duration=13 and event=1. Then the expected durations are drawn from the Cox model
-and the NPSF method as with \code{\link[coxed]{coxed.npsf}}.
+This function requires the data to be reported as cumulative durations. The cumulative baseline hazard
+function model is estimated using the ending times for each interval. Then the expected durations are
+drawn from the Cox model and the NPSF method as with \code{\link[coxed]{coxed.npsf}}.
 }
 \examples{
 bs.surv <- Surv(time = boxsteffensmeier$start, time2 = boxsteffensmeier$te,
      event = boxsteffensmeier$cut_hi)
 bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method = "breslow")
 
-ed <- coxed.npsf.tvc(bs.cox, cluster=boxsteffensmeier$caseid)
+ed <- coxed.npsf.tvc(bs.cox)
 ed$exp.dur
 }
 \references{

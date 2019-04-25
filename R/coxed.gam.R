@@ -87,17 +87,17 @@ coxed.gam <- function(cox.model, newdata=NULL, k=-1, coef=NULL, b.ind=NULL, warn
      exp.xb <- exp(predict(cox.model, type="lp"))
      if(!is.null(coef)) exp.xb.bs <- exp.xb[b.ind]
 
-     gam.data <- data.frame(y=y, failed=failed, rank.xb = rank(exp.xb, ties.method = ties.method))
+     gam.data <- data.frame(y=y, failed=failed, rank.xb = rank(exp.xb))
 
      if(!is.null(coef)){
-          gam.data.bs <- data.frame(y=y.bs, failed=failed.bs, rank.xb = rank(exp.xb.bs, ties.method = ties.method))
+          gam.data.bs <- data.frame(y=y.bs, failed=failed.bs, rank.xb = rank(exp.xb.bs))
           gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data.bs, failed == 1))
      } else {
           gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1))
      }
 
      gam.data <- dplyr::mutate(gam.data,
-                        rank.y = rank(y, ties.method = ties.method),
+                        rank.y = rank(y),
                         gam_fit = predict(gam.model, newdata=gam.data),
                         gam_fit_se = predict(gam.model, newdata=gam.data, se.fit=TRUE)$se.fit,
                         gam_fit_95lb = gam_fit + qnorm(.025)*gam_fit_se,
@@ -107,7 +107,7 @@ coxed.gam <- function(cox.model, newdata=NULL, k=-1, coef=NULL, b.ind=NULL, warn
      if(!is.null(newdata)){
           exp.xb2 <- exp(predict(cox.model, newdata=newdata, type="lp"))
           rank.xb <- rank.predict(x=exp.xb2, v=exp.xb, warn=warn)
-     } else rank.xb <- rank(exp.xb, ties.method = ties.method)
+     } else rank.xb <- rank(exp.xb)
 
      # Generate expected duration from GAM fit
      expect.duration <- predict(gam.model, newdata = data.frame(rank.xb = rank.xb),

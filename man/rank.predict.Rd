@@ -4,16 +4,12 @@
 \alias{rank.predict}
 \title{Generate predicted ranks for new observations given a new covariate profile}
 \usage{
-rank.predict(x, v, ties.method = "random", warn = TRUE)
+rank.predict(x, v, warn = TRUE)
 }
 \arguments{
 \item{x}{A vector of linear predictors for the estimation sample}
 
 \item{v}{A vector of linear predictors for the new data}
-
-\item{ties.method}{A character string specifying how ties are treated,
-see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-abbreviated.}
 
 \item{warn}{If \code{TRUE} the function warns the user when linear predictors in the new data are greater than
 or less than all of the linear predictors in the estimation sample}
