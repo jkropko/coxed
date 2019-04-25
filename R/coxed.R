@@ -191,9 +191,9 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      #Second data frame (newdata2)
      if(!is.null(newdata2)){
           if(method=="gam" & !tvc) dur2.pe <- coxed.gam(cox.model, newdata=newdata2,
-                                                                k=k)$exp.dur
+                                                        k=k)$exp.dur
           if(method=="gam" & tvc) dur2.pe <- coxed.gam.tvc(cox.model, newdata=newdata2,
-                                                                   k=k)$exp.dur
+                                                           k=k)$exp.dur
           if(method=="npsf" & !tvc) dur2.pe <- coxed.npsf(cox.model, newdata=newdata2)$exp.dur
           if(method=="npsf" & tvc) dur2.pe <- coxed.npsf.tvc(cox.model, newdata=newdata2)$exp.dur
           diff <- dur2.pe - dur1.pe
@@ -201,8 +201,10 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      }
 
      if(!bootstrap){
-          res <- list(exp.dur = exp.dur, mean = colMeans(exp.dur),
-                      median = apply(exp.dur, 2, median))
+          res <- list(exp.dur = exp.dur, mean = colMeans(exp.dur, na.rm=TRUE),
+                      median = apply(exp.dur, 2, FUN=function(x){
+                           median(x, na.rm=TRUE)
+                      }))
      }
 
      if(bootstrap){
@@ -214,11 +216,11 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
           if(tvc){
                id <- id[as.numeric(rownames(model.frame(cox.model)))]
                boot.cph <- rms::cph(Surv(as.numeric(cox.model$y[ , 1]),
-                                                       as.numeric(cox.model$y[ , 2]),
-                                                       as.numeric(cox.model$y[ , 3]),
-                                                       type = "counting") ~
-                                                       model.matrix(cox.model),
-                                               x = TRUE, y = TRUE)
+                                         as.numeric(cox.model$y[ , 2]),
+                                         as.numeric(cox.model$y[ , 3]),
+                                         type = "counting") ~
+                                         model.matrix(cox.model),
+                                    x = TRUE, y = TRUE)
                class(boot.cph) <- "tvc"
                boot.model <- bootcov2(boot.cph, B = B, cluster=id, ...)
           }
@@ -229,40 +231,44 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                exp.dur.mat <- matrix(numeric(), nrow(exp.dur), nrow(bs.coef))
                for(i in 1:nrow(bs.coef)){
                     if(method=="gam" & !tvc) dur1.pe <- coxed.gam(cox.model, newdata=newdata, warn=FALSE,
-                                                                          k=k,
-                                                                          coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                                  k=k,
+                                                                  coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="gam" & tvc) dur1.pe <- coxed.gam.tvc(cox.model, newdata=newdata, warn=FALSE,
-                                                                          k=k,
-                                                                          coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                                     k=k,
+                                                                     coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="npsf" & !tvc) dur1.pe <- coxed.npsf(cox.model, newdata=newdata,
-                                                                     coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                                    coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="npsf" & tvc) dur1.pe <- coxed.npsf.tvc(cox.model, newdata=newdata,
-                                                                     coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     exp.dur.mat[,i] <- dur1.pe
                }
-               exp.dur.se <- apply(exp.dur.mat, 1, sd)
-               mean.vec <- colMeans(exp.dur.mat)
-               mean.se <- sd(mean.vec)
-               median.vec <- apply(exp.dur.mat, 2, median)
-               median.se <- sd(median.vec)
+               exp.dur.se <- apply(exp.dur.mat, 1, FUN=function(x){
+                    sd(x, na.rm=TRUE)
+               })
+               mean.vec <- colMeans(exp.dur.mat, na.rm=TRUE)
+               mean.se <- sd(mean.vec, na.rm=TRUE)
+               median.vec <- apply(exp.dur.mat, 2, FUN=function(x){
+                    median(x, na.rm=TRUE)
+               })
+               median.se <- sd(median.vec, na.rm=TRUE)
                if(confidence=="empirical"){
                     exp.dur.lb <- apply(exp.dur.mat, 1, FUN=function(x){
-                         quantile(x, (1-level)/2, names=FALSE)
+                         quantile(x, (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
                     exp.dur.ub <- apply(exp.dur.mat, 1, FUN=function(x){
-                         quantile(x, level + (1-level)/2, names=FALSE)
+                         quantile(x, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
-                    mean.lb <- quantile(mean.vec, (1-level)/2, names=FALSE)
-                    mean.ub <- quantile(mean.vec, level + (1-level)/2, names=FALSE)
-                    median.lb <- quantile(median.vec, (1-level)/2, names=FALSE)
-                    median.ub <- quantile(median.vec, level + (1-level)/2, names=FALSE)
+                    mean.lb <- quantile(mean.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    mean.ub <- quantile(mean.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median.lb <- quantile(median.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median.ub <- quantile(median.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                } else if(confidence=="studentized"){
                     exp.dur.lb <- exp.dur$exp.dur + qnorm((1-level)/2)*exp.dur.se
                     exp.dur.ub <- exp.dur$exp.dur + qnorm(level + (1-level)/2)*exp.dur.se
-                    mean.lb <- mean(exp.dur$exp.dur) + qnorm((1-level)/2)*mean.se
-                    mean.ub <- mean(exp.dur$exp.dur) + qnorm(level + (1-level)/2)*mean.se
-                    median.lb <- median(exp.dur$exp.dur) + qnorm((1-level)/2)*median.se
-                    median.ub <- median(exp.dur$exp.dur) + qnorm(level + (1-level)/2)*median.se
+                    mean.lb <- mean(exp.dur$exp.dur, na.rm=TRUE) + qnorm((1-level)/2)*mean.se
+                    mean.ub <- mean(exp.dur$exp.dur, na.rm=TRUE) + qnorm(level + (1-level)/2)*mean.se
+                    median.lb <- median(exp.dur$exp.dur, na.rm=TRUE) + qnorm((1-level)/2)*median.se
+                    median.ub <- median(exp.dur$exp.dur, na.rm=TRUE) + qnorm(level + (1-level)/2)*median.se
                } else if(confidence=="bca"){
                     exp.dur.bca <- apply(exp.dur.mat, 1, FUN=function(x){
                          bca(x, conf.level = level)
@@ -278,9 +284,9 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                }
                res <- list(exp.dur = data.frame(exp.dur = exp.dur$exp.dur, bootstrap.se = exp.dur.se,
                                                 lb = exp.dur.lb, ub = exp.dur.ub),
-                           mean = data.frame(mean = mean(exp.dur$exp.dur), bootstrap.se = mean.se,
+                           mean = data.frame(mean = mean(exp.dur$exp.dur, na.rm=TRUE), bootstrap.se = mean.se,
                                              lb = mean.lb, ub = mean.ub),
-                           median = data.frame(median = median(exp.dur$exp.dur), bootstrap.se = median.se,
+                           median = data.frame(median = median(exp.dur$exp.dur, na.rm=TRUE), bootstrap.se = median.se,
                                                lb = median.lb, ub = median.ub))
           } else {
                exp.dur1.mat <- matrix(numeric(), nrow(exp.dur), nrow(bs.coef))
@@ -290,102 +296,114 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                     if(method=="gam" & !tvc){
                          warn <- (i==1)
                          dur1.pe <- coxed.gam(cox.model, newdata=newdata,
-                                                      k=k, warn=warn,
-                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                              k=k, warn=warn,
+                                              coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                          dur2.pe <- coxed.gam(cox.model, newdata=newdata2,
-                                                      k=k, warn=warn,
-                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                              k=k, warn=warn,
+                                              coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     }
                     if(method=="gam" & tvc){
                          warn <- (i==1)
                          dur1.pe <- coxed.gam.tvc(cox.model, newdata=newdata,
-                                                      k=k, warn=warn,
-                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                  k=k, warn=warn,
+                                                  coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                          dur2.pe <- coxed.gam.tvc(cox.model, newdata=newdata2,
-                                                      k=k, warn=warn,
-                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                  k=k, warn=warn,
+                                                  coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     }
                     if(method=="npsf" & !tvc){
                          dur1.pe <- coxed.npsf(cox.model, newdata=newdata,
-                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                               coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                          dur2.pe <- coxed.npsf(cox.model, newdata=newdata2,
-                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                               coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     }
                     if(method=="npsf" & tvc){
                          dur1.pe <- coxed.npsf.tvc(cox.model, newdata=newdata,
-                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                   coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                          dur2.pe <- coxed.npsf.tvc(cox.model, newdata=newdata2,
-                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
+                                                   coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     }
                     exp.dur1.mat[,i] <- dur1.pe
                     exp.dur2.mat[,i] <- dur2.pe
                     diff.mat[,i] <- dur2.pe - dur1.pe
                }
-               exp.dur1.se <- apply(exp.dur1.mat, 1, sd)
-               mean1.vec <- colMeans(exp.dur1.mat)
-               mean1.se <- sd(mean1.vec)
-               median1.vec <- apply(exp.dur1.mat, 2, median)
-               median1.se <- sd(median1.vec)
-               exp.dur2.se <- apply(exp.dur2.mat, 1, sd)
-               mean2.vec <- colMeans(exp.dur2.mat)
-               mean2.se <- sd(mean2.vec)
-               median2.vec <- apply(exp.dur2.mat, 2, median)
-               median2.se <- sd(median2.vec)
-               diff.se <- apply(diff.mat, 1, sd)
-               mean.diff.vec <- colMeans(diff.mat)
-               mean.diff.se <- sd(mean.diff.vec)
-               median.diff.vec <- apply(diff.mat, 2, median)
-               median.diff.se <- sd(median.diff.vec)
+               exp.dur1.se <- apply(exp.dur1.mat, 1, FUN=function(x){
+                    sd(x, na.rm=TRUE)
+               })
+               mean1.vec <- colMeans(exp.dur1.mat, na.rm=TRUE)
+               mean1.se <- sd(mean1.vec, na.rm=TRUE)
+               median1.vec <- apply(exp.dur1.mat, 2, FUN=function(x){
+                    median(x, na.rm=TRUE)
+               })
+               median1.se <- sd(median1.vec, na.rm=TRUE)
+               exp.dur2.se <- apply(exp.dur2.mat, 1, FUN=function(x){
+                    sd(x, na.rm=TRUE)
+               })
+               mean2.vec <- colMeans(exp.dur2.mat, na.rm=TRUE)
+               mean2.se <- sd(mean2.vec, na.rm=TRUE)
+               median2.vec <- apply(exp.dur2.mat, 2, FUN=function(x){
+                    median(x, na.rm=TRUE)
+               })
+               median2.se <- sd(median2.vec, na.rm=TRUE)
+               diff.se <- apply(diff.mat, 1, FUN=function(x){
+                    sd(x, na.rm=TRUE)
+               })
+               mean.diff.vec <- colMeans(diff.mat, na.rm=TRUE)
+               mean.diff.se <- sd(mean.diff.vec, na.rm=TRUE)
+               median.diff.vec <- apply(diff.mat, 2, FUN=function(x){
+                    median(x, na.rm=TRUE)
+               })
+               median.diff.se <- sd(median.diff.vec, na.rm=TRUE)
                if(confidence=="empirical"){
                     exp.dur1.lb <- apply(exp.dur1.mat, 1, FUN=function(x){
-                         quantile(x, (1-level)/2, names=FALSE)
+                         quantile(x, (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
                     exp.dur1.ub <- apply(exp.dur1.mat, 1, FUN=function(x){
-                         quantile(x, level + (1-level)/2, names=FALSE)
+                         quantile(x, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
-                    mean1.lb <- quantile(mean1.vec, (1-level)/2, names=FALSE)
-                    mean1.ub <- quantile(mean1.vec, level + (1-level)/2, names=FALSE)
-                    median1.lb <- quantile(median1.vec, (1-level)/2, names=FALSE)
-                    median1.ub <- quantile(median1.vec, level + (1-level)/2, names=FALSE)
+                    mean1.lb <- quantile(mean1.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    mean1.ub <- quantile(mean1.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median1.lb <- quantile(median1.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median1.ub <- quantile(median1.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                     exp.dur2.lb <- apply(exp.dur2.mat, 1, FUN=function(x){
-                         quantile(x, (1-level)/2, names=FALSE)
+                         quantile(x, (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
                     exp.dur2.ub <- apply(exp.dur2.mat, 1, FUN=function(x){
-                         quantile(x, level + (1-level)/2, names=FALSE)
+                         quantile(x, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
-                    mean2.lb <- quantile(mean2.vec, (1-level)/2, names=FALSE)
-                    mean2.ub <- quantile(mean2.vec, level + (1-level)/2, names=FALSE)
-                    median2.lb <- quantile(median2.vec, (1-level)/2, names=FALSE)
-                    median2.ub <- quantile(median2.vec, level + (1-level)/2, names=FALSE)
+                    mean2.lb <- quantile(mean2.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    mean2.ub <- quantile(mean2.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median2.lb <- quantile(median2.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median2.ub <- quantile(median2.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                     diff.lb <- apply(diff.mat, 1, FUN=function(x){
-                         quantile(x, (1-level)/2, names=FALSE)
+                         quantile(x, (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
                     diff.ub <- apply(diff.mat, 1, FUN=function(x){
-                         quantile(x, level + (1-level)/2, names=FALSE)
+                         quantile(x, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                     })
-                    mean.diff.lb <- quantile(mean.diff.vec, (1-level)/2, names=FALSE)
-                    mean.diff.ub <- quantile(mean.diff.vec, level + (1-level)/2, names=FALSE)
-                    median.diff.lb <- quantile(median.diff.vec, (1-level)/2, names=FALSE)
-                    median.diff.ub <- quantile(median.diff.vec, level + (1-level)/2, names=FALSE)
+                    mean.diff.lb <- quantile(mean.diff.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    mean.diff.ub <- quantile(mean.diff.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median.diff.lb <- quantile(median.diff.vec, (1-level)/2, names=FALSE, na.rm=TRUE)
+                    median.diff.ub <- quantile(median.diff.vec, level + (1-level)/2, names=FALSE, na.rm=TRUE)
                } else if(confidence=="studentized"){
                     exp.dur1.lb <- exp.dur[,1] + qnorm((1-level)/2)*exp.dur1.se
                     exp.dur1.ub <- exp.dur[,1] + qnorm(level + (1-level)/2)*exp.dur1.se
-                    mean1.lb <- mean(exp.dur[,1]) + qnorm((1-level)/2)*mean1.se
-                    mean1.ub <- mean(exp.dur[,1]) + qnorm(level + (1-level)/2)*mean1.se
-                    median1.lb <- median(exp.dur[,1]) + qnorm((1-level)/2)*median1.se
-                    median1.ub <- median(exp.dur[,1]) + qnorm(level + (1-level)/2)*median1.se
+                    mean1.lb <- mean(exp.dur[,1], na.rm=TRUE) + qnorm((1-level)/2)*mean1.se
+                    mean1.ub <- mean(exp.dur[,1], na.rm=TRUE) + qnorm(level + (1-level)/2)*mean1.se
+                    median1.lb <- median(exp.dur[,1], na.rm=TRUE) + qnorm((1-level)/2)*median1.se
+                    median1.ub <- median(exp.dur[,1], na.rm=TRUE) + qnorm(level + (1-level)/2)*median1.se
                     exp.dur2.lb <- exp.dur[,2] + qnorm((1-level)/2)*exp.dur2.se
                     exp.dur2.ub <- exp.dur[,2] + qnorm(level + (1-level)/2)*exp.dur2.se
-                    mean2.lb <- mean(exp.dur[,2]) + qnorm((1-level)/2)*mean2.se
-                    mean2.ub <- mean(exp.dur[,2]) + qnorm(level + (1-level)/2)*mean2.se
-                    median2.lb <- median(exp.dur[,2]) + qnorm((1-level)/2)*median2.se
-                    median2.ub <- median(exp.dur[,2]) + qnorm(level + (1-level)/2)*median2.se
+                    mean2.lb <- mean(exp.dur[,2], na.rm=TRUE) + qnorm((1-level)/2)*mean2.se
+                    mean2.ub <- mean(exp.dur[,2], na.rm=TRUE) + qnorm(level + (1-level)/2)*mean2.se
+                    median2.lb <- median(exp.dur[,2], na.rm=TRUE) + qnorm((1-level)/2)*median2.se
+                    median2.ub <- median(exp.dur[,2], na.rm=TRUE) + qnorm(level + (1-level)/2)*median2.se
                     diff.lb <- exp.dur[,3] + qnorm((1-level)/2)*diff.se
                     diff.ub <- exp.dur[,3] + qnorm(level + (1-level)/2)*diff.se
-                    mean.diff.lb <- mean(exp.dur[,3]) + qnorm((1-level)/2)*mean.diff.se
-                    mean.diff.ub <- mean(exp.dur[,3]) + qnorm(level + (1-level)/2)*mean.diff.se
-                    median.diff.lb <- median(exp.dur[,3]) + qnorm((1-level)/2)*median.diff.se
-                    median.diff.ub <- median(exp.dur[,3]) + qnorm(level + (1-level)/2)*median.diff.se
+                    mean.diff.lb <- mean(exp.dur[,3], na.rm=TRUE) + qnorm((1-level)/2)*mean.diff.se
+                    mean.diff.ub <- mean(exp.dur[,3], na.rm=TRUE) + qnorm(level + (1-level)/2)*mean.diff.se
+                    median.diff.lb <- median(exp.dur[,3], na.rm=TRUE) + qnorm((1-level)/2)*median.diff.se
+                    median.diff.ub <- median(exp.dur[,3], na.rm=TRUE) + qnorm(level + (1-level)/2)*median.diff.se
                } else if(confidence=="bca"){
                     exp.dur1.bca <- apply(exp.dur1.mat, 1, FUN=function(x){
                          bca(x, conf.level = level)
@@ -423,21 +441,21 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                }
                res <- list(exp.dur1 = data.frame(exp.dur = exp.dur[,1], bootstrap.se = exp.dur1.se,
                                                  lb = exp.dur1.lb, ub = exp.dur1.ub),
-                           mean1 = data.frame(mean = mean(exp.dur[,1]), bootstrap.se = mean1.se,
+                           mean1 = data.frame(mean = mean(exp.dur[,1], na.rm=TRUE), bootstrap.se = mean1.se,
                                               lb = mean1.lb, ub = mean1.ub),
-                           median1 = data.frame(median = median(exp.dur[,1]), bootstrap.se = median1.se,
+                           median1 = data.frame(median = median(exp.dur[,1], na.rm=TRUE), bootstrap.se = median1.se,
                                                 lb = median1.lb, ub = median1.ub),
                            exp.dur2 = data.frame(exp.dur = exp.dur[,2], bootstrap.se = exp.dur2.se,
                                                  lb = exp.dur2.lb, ub = exp.dur2.ub),
-                           mean2 = data.frame(mean = mean(exp.dur[,2]), bootstrap.se = mean2.se,
+                           mean2 = data.frame(mean = mean(exp.dur[,2], na.rm=TRUE), bootstrap.se = mean2.se,
                                               lb = mean2.lb, ub = mean2.ub),
-                           median2 = data.frame(median = median(exp.dur[,2]), bootstrap.se = median2.se,
+                           median2 = data.frame(median = median(exp.dur[,2], na.rm=TRUE), bootstrap.se = median2.se,
                                                 lb = median2.lb, ub = median2.ub),
                            diff = data.frame(exp.dur = exp.dur[,3], bootstrap.se = diff.se,
                                              lb = diff.lb, ub = diff.ub),
-                           mean.diff = data.frame(mean = mean(exp.dur[,3]), bootstrap.se = mean.diff.se,
+                           mean.diff = data.frame(mean = mean(exp.dur[,3], na.rm=TRUE), bootstrap.se = mean.diff.se,
                                                   lb = mean.diff.lb, ub = mean.diff.ub),
-                           median.diff = data.frame(median = median(exp.dur[,3]), bootstrap.se = median.diff.se,
+                           median.diff = data.frame(median = median(exp.dur[,3], na.rm=TRUE), bootstrap.se = median.diff.se,
                                                     lb = median.diff.lb, ub = median.diff.ub))
           }
 

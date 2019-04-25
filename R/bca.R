@@ -37,7 +37,7 @@ bca <- function(theta, conf.level = .95){
   sims <- length(theta)
   z.inv <- length(theta[theta < mean(theta)])/sims
   z <- qnorm(z.inv)
-  U <- (sims - 1) * (mean(theta) - theta)
+  U <- (sims - 1) * (mean(theta, na.rm=TRUE) - theta)
   top <- sum(U^3)
   under <- 6 * (sum(U^2))^{3/2}
   a <- top / under
