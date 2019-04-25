@@ -212,6 +212,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                                                         model.matrix(cox.model),
                                                    x = TRUE, y = TRUE), B = B, ...)
           if(tvc){
+               id <- id[as.numeric(rownames(model.frame(cox.model)))]
                boot.cph <- rms::cph(Surv(as.numeric(cox.model$y[ , 1]),
                                                        as.numeric(cox.model$y[ , 2]),
                                                        as.numeric(cox.model$y[ , 3]),
