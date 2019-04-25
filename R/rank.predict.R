@@ -4,9 +4,6 @@
 #' are specified, and is not intended to be used by itself.
 #' @param x A vector of linear predictors for the estimation sample
 #' @param v A vector of linear predictors for the new data
-#' @param ties.method A character string specifying how ties are treated,
-#' see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-#' abbreviated.
 #' @param warn If \code{TRUE} the function warns the user when linear predictors in the new data are greater than
 #' or less than all of the linear predictors in the estimation sample
 #' @details The purpose of \code{rank.predict} is to determine for a single new observation what the rank of that
@@ -29,20 +26,33 @@
 #' newLPs <- rnorm(5)
 #' newLP.rank <- rank.predict(x=newLPs, v=estimationLPs)
 #' cbind(newLPs, newLP.rank)
-rank.predict <- function(x, v, ties.method="random", warn=TRUE){
-     r <- sapply(x, FUN=function(t){
-          v2 <- rbind(data.frame(v=v, kind=0), data.frame(v=t, kind=1))
-          v2$v.rank <- rank(v2$v, ties.method=ties.method)
-          v2 <- v2[v2$kind==1,]
-          return(v2$v.rank)
-     })
+rank.predict <- function(x, v, warn=TRUE){
+     d <- rbind(cbind(rank(v),v, "v", NA), cbind(NA, x, "x", 1:length(x)))
+     d <- d[order(d[,2]),]
+
+     # thanks to Ruben for this code: https://stackoverflow.com/questions/7735647/replacing-nas-with-latest-non-na-value
+     repeat.before = function(x) {   # repeats the last non NA value. Keeps leading NA
+          ind = which(!is.na(x))      # get positions of nonmissing values
+          if(is.na(x[1]))             # if it begins with a missing, add the
+               ind = c(1,ind)        # first position to the indices
+          rep(x[ind], times = diff(   # repeat the values at these indices
+               c(ind, length(x) + 1) )) # diffing the indices + length yields how often
+     }
+
+     d[,1] <- repeat.before(d[,1])
+     d <- d[d[,3]=="x",]
+     if(!is.matrix(d)) d <- t(d)
+     d[is.na(d[,1]),1] <- 1
+     d <- d[order(as.numeric(d[,4])),]
+     d[is.na(d[,2]),1] <- NA
+     r <- as.numeric(d[,1])
      c1 <- sum(r==1)
      c2 <- sum(r > length(v))
      paste1 <- paste(c("New data contain", c1,
-                       "observations with linear predictors less than all linear predictors in the estimation sample. These observations will all have the same predicted duration"),
+                       "observations with linear predictors less than or equal to all linear predictors in the estimation sample. These observations will all have the same predicted duration"),
                      collapse=" ")
      paste2 <- paste(c("New data contain", c2,
-                       "observations with linear predictors greater than all linear predictors in the estimation sample. These observations will all have the same predicted duration"),
+                       "observations with linear predictors greater than or equal to all linear predictors in the estimation sample. These observations will all have the same predicted duration"),
                      collapse=" ")
      if(warn & min(r)==1) warning(paste1)
      if(warn & max(r)>length(v)) warning(paste2)
