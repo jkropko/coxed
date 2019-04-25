@@ -10,9 +10,6 @@
 #' @param k The number of knots in the GAM smoother. The default is -1, which
 #' employs the \code{\link[mgcv]{choose.k}} function from the \code{\link{mgcv}} package
 #' to choose the number of knots
-#' @param ties.method A character string specifying how ties are treated,
-#' see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-#' abbreviated
 #' @param coef A vector of new coefficients to replace the \code{coefficients} attribute
 #' of the \code{cox.model}. Used primarily for bootstrapping, to recalculate durations
 #' using new coefficients derived from a bootstrapped sample.
@@ -78,8 +75,7 @@
 #' bsample <- sample(1:nrow(martinvanberg), nrow(martinvanberg), replace=TRUE)
 #' newcoefs <- rnorm(8)
 #' ed2 <- coxed.gam(mv.cox, b.ind=bsample, coef=newcoefs)
-coxed.gam <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
-                              coef=NULL, b.ind=NULL, warn=TRUE) {
+coxed.gam <- function(cox.model, newdata=NULL, k=-1, coef=NULL, b.ind=NULL, warn=TRUE) {
 
      if(!is.null(coef)){
           y.bs <- cox.model$y[b.ind,1]
@@ -110,7 +106,7 @@ coxed.gam <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
      #New data
      if(!is.null(newdata)){
           exp.xb2 <- exp(predict(cox.model, newdata=newdata, type="lp"))
-          rank.xb <- rank.predict(x=exp.xb2, v=exp.xb, ties.method=ties.method, warn=warn)
+          rank.xb <- rank.predict(x=exp.xb2, v=exp.xb, warn=warn)
      } else rank.xb <- rank(exp.xb, ties.method = ties.method)
 
      # Generate expected duration from GAM fit

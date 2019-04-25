@@ -10,9 +10,6 @@
 #' @param k The number of knots in the GAM smoother. The default is -1, which
 #' employs the \code{\link[mgcv]{choose.k}} function from the \code{\link{mgcv}} package
 #' to choose the number of knots
-#' @param ties.method A character string specifying how ties are treated,
-#' see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-#' abbreviated
 #' @param coef A vector of new coefficients to replace the \code{coefficients} attribute
 #' of the \code{cox.model}. Used primarily for bootstrapping, to recalculate durations
 #' using new coefficients derived from a bootstrapped sample.
@@ -49,22 +46,21 @@
 #'
 #' ed <- coxed.gam.tvc(bs.cox)
 #' ed$exp.dur
-coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
-                              coef=NULL, b.ind=NULL, warn=TRUE) {
+coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, coef=NULL, b.ind=NULL, warn=TRUE) {
 
      exp.xb <- exp(predict(cox.model, type="lp"))
 
      if(is.null(coef)) gam.data <- data.frame(y=cox.model$y[,2],
                                               failed=cox.model$y[,3],
-                                              rank.xb = rank(exp.xb, ties.method = ties.method))
+                                              rank.xb = rank(exp.xb))
      if(!is.null(coef)) gam.data <- data.frame(y=cox.model$y[b.ind,2],
                                                failed=cox.model$y[b.ind,3],
-                                               rank.xb = rank(exp.xb[b.ind], ties.method = ties.method))
+                                               rank.xb = rank(exp.xb[b.ind]))
 
      gam.model <- gam(y ~ s(rank.xb, bs = "cr", k = k), data = subset(gam.data, failed == 1))
 
      gam.data <- dplyr::mutate(gam.data,
-                        rank.y = rank(y, ties.method = ties.method),
+                        rank.y = rank(y),
                         gam_fit = predict(gam.model, newdata=gam.data),
                         gam_fit_se = predict(gam.model, newdata=gam.data, se.fit=TRUE)$se.fit,
                         gam_fit_95lb = gam_fit + qnorm(.025)*gam_fit_se,
@@ -73,8 +69,8 @@ coxed.gam.tvc <- function(cox.model, newdata=NULL, k=-1, ties.method="random",
      #New data
      if(!is.null(newdata)){
           exp.xb2 <- exp(predict(cox.model, newdata=newdata, type="lp"))
-          rank.xb <- rank.predict(x=exp.xb2, v=exp.xb, ties.method=ties.method, warn=warn)
-     } else rank.xb <- rank(exp.xb, ties.method = ties.method)
+          rank.xb <- rank.predict(x=exp.xb2, v=exp.xb, warn=warn)
+     } else rank.xb <- rank(exp.xb)
 
      # Generate expected duration from GAM fit
      expect.duration <- predict(gam.model, newdata = data.frame(rank.xb = rank.xb),

@@ -25,9 +25,6 @@
 #' @param k The number of knots in the GAM smoother. The default is -1, which
 #' employs the \code{\link[mgcv]{choose.k}} function from the \code{\link{mgcv}} package
 #' to choose the number of knots
-#' @param ties.method A character string specifying how ties are treated,
-#' see ‘Details’ in the documentation for \code{\link[base]{rank}}; can be
-#' abbreviated
 #' @param B Number of bootstrap simulation iterations
 #' @param confidence  If "studentized" (the default), bootstrapped CIs
 #' are calculated from the tails of a normal distribution where the mean and
@@ -162,7 +159,7 @@
 #' summary(ed1, stat="mean")
 
 coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, method="npsf",
-                  k=-1, ties.method="random", B = 200, confidence="studentized",
+                  k=-1, B = 200, confidence="studentized",
                   level=.95, id=NULL, ...){
 
      tvc <- (ncol(cox.model$y)==3)
@@ -174,8 +171,8 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
 
      #First data frame (newdata), or estimation sample if NULL
      if(method=="gam"){
-          if(!tvc) dur1 <- coxed.gam(cox.model, newdata=newdata, k=k, ties.method=ties.method)
-          if(tvc) dur1 <- coxed.gam.tvc(cox.model, newdata=newdata, k=k, ties.method=ties.method)
+          if(!tvc) dur1 <- coxed.gam(cox.model, newdata=newdata, k=k)
+          if(tvc) dur1 <- coxed.gam.tvc(cox.model, newdata=newdata, k=k)
           dur1.pe <- dur1$exp.dur
           gam.model <- dur1$gam.model
           gam.data <- dur1$gam.data
@@ -194,9 +191,9 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      #Second data frame (newdata2)
      if(!is.null(newdata2)){
           if(method=="gam" & !tvc) dur2.pe <- coxed.gam(cox.model, newdata=newdata2,
-                                                                k=k, ties.method=ties.method)$exp.dur
+                                                                k=k)$exp.dur
           if(method=="gam" & tvc) dur2.pe <- coxed.gam.tvc(cox.model, newdata=newdata2,
-                                                                   k=k, ties.method=ties.method)$exp.dur
+                                                                   k=k)$exp.dur
           if(method=="npsf" & !tvc) dur2.pe <- coxed.npsf(cox.model, newdata=newdata2)$exp.dur
           if(method=="npsf" & tvc) dur2.pe <- coxed.npsf.tvc(cox.model, newdata=newdata2)$exp.dur
           diff <- dur2.pe - dur1.pe
@@ -231,10 +228,10 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                exp.dur.mat <- matrix(numeric(), nrow(exp.dur), nrow(bs.coef))
                for(i in 1:nrow(bs.coef)){
                     if(method=="gam" & !tvc) dur1.pe <- coxed.gam(cox.model, newdata=newdata, warn=FALSE,
-                                                                          k=k, ties.method=ties.method,
+                                                                          k=k,
                                                                           coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="gam" & tvc) dur1.pe <- coxed.gam.tvc(cox.model, newdata=newdata, warn=FALSE,
-                                                                          k=k, ties.method=ties.method,
+                                                                          k=k,
                                                                           coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     if(method=="npsf" & !tvc) dur1.pe <- coxed.npsf(cox.model, newdata=newdata,
                                                                      coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
@@ -292,19 +289,19 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                     if(method=="gam" & !tvc){
                          warn <- (i==1)
                          dur1.pe <- coxed.gam(cox.model, newdata=newdata,
-                                                      k=k, ties.method=ties.method, warn=warn,
+                                                      k=k, warn=warn,
                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                          dur2.pe <- coxed.gam(cox.model, newdata=newdata2,
-                                                      k=k, ties.method=ties.method, warn=warn,
+                                                      k=k, warn=warn,
                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     }
                     if(method=="gam" & tvc){
                          warn <- (i==1)
                          dur1.pe <- coxed.gam.tvc(cox.model, newdata=newdata,
-                                                      k=k, ties.method=ties.method, warn=warn,
+                                                      k=k, warn=warn,
                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                          dur2.pe <- coxed.gam.tvc(cox.model, newdata=newdata2,
-                                                      k=k, ties.method=ties.method, warn=warn,
+                                                      k=k, warn=warn,
                                                       coef=bs.coef[i,], b.ind=bs.obs[,i])$exp.dur
                     }
                     if(method=="npsf" & !tvc){
