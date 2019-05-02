@@ -41,37 +41,37 @@
 #' ed$exp.dur
 coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL) {
 
-     y <- cox.model$y[,2]
+     start <- ceiling(cox.model$y[,1]) ## ceiling() to deal with decimals
+     end <- ceiling(cox.model$y[,2])
      failed <- cox.model$y[,3]
      exp.xb <- exp(predict(cox.model, type="lp"))
      if(!is.null(coef)){
-          y <- y[b.ind]
+          start <- start[b.ind]
+          end <- end[b.ind]
           failed <- failed[b.ind]
           exp.xb <- exp.xb[b.ind]
      }
 
-     # Compile total failures (only non-censored) at each time point
-     h <- as.data.frame(cbind(y, failed, exp.xb))
-     h <- h[order(h[,1]),]
-     h <- aggregate(h[,-1], by=list(h[,1]), FUN="sum")
-     colnames(h) <- c("time", "total.failures", "exp.xb")
+     h <- as.data.frame(cbind(start, end, failed, exp.xb))
+     diff <- h$end - h$start
+     h <- h[rep(1:nrow(h), diff),]
+     h$time <- h$start + sequence(diff)
+     h$failed <- ifelse(h$time==h$end, h$failed, 0)
 
-     # Construction of the risk set (includes censored and non-censored observations)
-     h[,3] <- rev(cumsum(rev(h[,3])))
-
+     h <- dplyr::group_by(h, time)
+     h <- dplyr::summarize(h, d = sum(failed),
+                           exp.xb = sum(exp.xb))
      #Construct CBH, baseline survivor and failure CDF
-     CBH <- cumsum(h[,2]/h[,3])
+     CBH <- cumsum(h$d / h$exp.xb)
      S.bl <- exp(-CBH)
      baseline.functions <- data.frame(time = h$time, cbh = CBH, survivor = S.bl)
 
      if(!is.null(newdata)) exp.xb <- exp(predict(cox.model, newdata=newdata, type="lp"))
 
      #Generate EDs for all observations in exp.xb
-     survival <- t(sapply(exp.xb, FUN=function(x){S.bl^x}, simplify=TRUE))
-     expect.duration <- apply(survival, 1, FUN=function(x){
-          sum(diff(h[,1])*x[-1])
+     expect.duration <- sapply(exp.xb, FUN=function(x){
+          sum(S.bl^x)
      })
-     expect.duration.med <- sum(diff(h[,1])*S.bl^(median(exp.xb))[-1])
 
      return(list(baseline.functions = baseline.functions,
                  exp.dur = expect.duration))
