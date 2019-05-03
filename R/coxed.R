@@ -227,7 +227,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                boot.model <- bootcov2(boot.cph, B = B, cluster=id, ...)
           }
           bs.coef <- boot.model$boot.Coef
-          bs.obs <- boot.model$b.ind
+          bs.obs <- na.omit(boot.model$b.ind)
 
           if(is.null(newdata2)){
                exp.dur.mat <- matrix(numeric(), nrow(exp.dur), nrow(bs.coef))
