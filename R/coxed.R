@@ -171,8 +171,6 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      if(!confidence %in% c("studentized", "empirical", "bca")) stop("confidence must be one of 'studentized', 'empirical', or 'bca'")
      if(tvc & is.null(id)) stop("id must be filled in with the case ID in the data used to estimate the Cox PH model if you have time-varying covariates.")
 
-     if(tvc) id <- id[as.numeric(rownames(model.frame(cox.model)))]
-
      #First data frame (newdata), or estimation sample if NULL
      if(method=="gam"){
           if(!tvc) dur1 <- coxed.gam(cox.model, newdata=newdata, k=k)
