@@ -53,7 +53,6 @@ coxed.npsf.tvc <- function(cox.model, newdata=NULL, coef=NULL, b.ind=NULL) {
      }
 
      h <- as.data.frame(cbind(start, end, failed, exp.xb))
-     h <- na.omit(h)
      diff <- h$end - h$start
      h <- h[rep(1:nrow(h), diff),]
      h$time <- h$start + sequence(diff)

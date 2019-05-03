@@ -35,9 +35,11 @@
 #' @param level The level of the confidence interval to calculate (default is
 #' .95 for a 95 percent confidence interval)
 #' @param id Cluster variable if bootstrapping is to be done by clusters of
-#' observations rather than individual observations. This must be filled in with
-#' the case ID if the data are coded with time-varying covariates (using the \code{time2}
-#' argument in the \code{\link[survival]{Surv}} function)
+#' observations rather than individual observations. If the data are coded
+#' with time-varying covariates (using the \code{time2} argument in the
+#' \code{\link[survival]{Surv}} function), this variable must be the ID variable
+#' in the \emph{data that are used to estimate the Cox PH model}, and not the ID
+#' variable in new data.
 #' @param ... Additional arguments to be passed to the \code{\link[coxed]{bootcov2}}
 #' function, an adaptation of the \code{\link[rms]{bootcov}} function in the
 #' \code{\link{rms}} package
@@ -167,7 +169,9 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      if(!method %in% c("gam", "npsf")) stop("method must be one of 'gam' and 'npsf'")
      if(!is.null(newdata2) & !all(dim(newdata)==dim(newdata2))) stop("newdata and newdata2 must have the same dimensions")
      if(!confidence %in% c("studentized", "empirical", "bca")) stop("confidence must be one of 'studentized', 'empirical', or 'bca'")
-     if(tvc & is.null(id)) stop("id must be filled in with the case ID if you have time-varying covariates.")
+     if(tvc & is.null(id)) stop("id must be filled in with the case ID in the data used to estimate the Cox PH model if you have time-varying covariates.")
+
+     if(tvc) id <- id[as.numeric(rownames(model.frame(cox.model)))]
 
      #First data frame (newdata), or estimation sample if NULL
      if(method=="gam"){

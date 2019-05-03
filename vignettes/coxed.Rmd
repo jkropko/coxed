@@ -231,7 +231,7 @@ bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method
 summary(bs.cox)
 ```
 
-The `coxed()` function automatically detects whether time-varying covariates are used in the model and it takes steps to account for this structure in predicting expected durations and in estimating marginal effects. The only additional step that the user needs to take is to specify the ID variable in the `id` argument, so that the function knows which intervals refer to which observations.
+The `coxed()` function automatically detects whether time-varying covariates are used in the model and it takes steps to account for this structure in predicting expected durations and in estimating marginal effects. The only additional step that the user needs to take is to specify the ID variable in the `id` argument, so that the function knows which intervals refer to which observations. The `id` variable must be the ID from the data that was used to estimate the Cox PH model, and NOT the ID variable in any new data frame. 
 ```{r tvced}
 ed1 <- coxed(bs.cox, method="npsf", id=boxsteffensmeier$caseid)
 summary(ed1, stat="mean")

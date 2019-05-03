@@ -47,9 +47,11 @@ and acceleration method described by DiCiccio and Efron (1996).}
 .95 for a 95 percent confidence interval)}
 
 \item{id}{Cluster variable if bootstrapping is to be done by clusters of
-observations rather than individual observations. This must be filled in with
-the case ID if the data are coded with time-varying covariates (using the \code{time2}
-argument in the \code{\link[survival]{Surv}} function)}
+observations rather than individual observations. If the data are coded
+with time-varying covariates (using the \code{time2} argument in the
+\code{\link[survival]{Surv}} function), this variable must be the ID variable
+in the \emph{data that are used to estimate the Cox PH model}, and not the ID
+variable in new data.}
 
 \item{...}{Additional arguments to be passed to the \code{\link[coxed]{bootcov2}}
 function, an adaptation of the \code{\link[rms]{bootcov}} function in the
