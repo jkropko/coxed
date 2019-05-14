@@ -136,7 +136,7 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
 
           if(!fixed.hazard & is.null(hazard.fun)) baseline <- baseline.build(T=T, knots=knots, spline=spline)
 
-          xb <- generate.lm(baseline, X=X, beta=beta, N=N, xvars=xvars, censor=censor, type=type)
+          xb <- generate.lm(baseline, X=X, beta=beta, mu=mu, sd=sd, N=N, xvars=xvars, censor=censor, type=type)
           data <- xb$data
           if(xb$tvc) xdata <- dplyr::select(data, -id, -failed, -start, -end)
           if(!xb$tvc) xdata <- dplyr::select(data, -y)
