@@ -170,7 +170,7 @@ bs.surv <- Surv(time = boxsteffensmeier$start, time2 = boxsteffensmeier$te,
 bs.cox <- coxph(bs.surv ~ ec + dem + south + iv, data = boxsteffensmeier, method = "breslow")
 summary(bs.cox)
 
-ed1 <- coxed(bs.cox, method="npsf")
+ed1 <- coxed(bs.cox, method="npsf", id=boxsteffensmeier$caseid)
 ed1$exp.dur
 summary(ed1, stat="mean")
 }
