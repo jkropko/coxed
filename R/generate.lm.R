@@ -63,6 +63,7 @@ generate.lm <- function(baseline, X=NULL, N=1000, type="none", beta=NULL, xvars=
           if(!is.null(beta)) beta <- as.matrix(beta)
           XB <- X%*%beta
           survival <- t(sapply(XB, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
+          survival <- cbind(1, survival)
           y <- apply(survival, 1, FUN=function(x){
                z <- diff(x < runif(1))
                r <- ifelse(all(z==0), T, which.max(z))
@@ -83,6 +84,7 @@ generate.lm <- function(baseline, X=NULL, N=1000, type="none", beta=NULL, xvars=
           X <- as.matrix(merge(Xmat1, Xmat2, by="N")[,-c(1,2)])
           XB <- matrix(X%*%beta, N, T, byrow=TRUE)
           survival <- t(apply(XB, 1, FUN=function(x){baseline$survivor^exp(x)}))
+          survival <- cbind(1, survival)
           lifetimes <- apply(survival, 1, FUN=function(x){
                z <- diff(x < runif(1))
                r <- ifelse(all(z==0), T, which.max(z))
@@ -122,6 +124,7 @@ generate.lm <- function(baseline, X=NULL, N=1000, type="none", beta=NULL, xvars=
                beta.mat <- cbind(time=1:nrow(beta), beta)
           }
           survival <- t(apply(XB, 1, FUN=function(x){baseline$survivor^exp(x)}))
+          survival <- cbind(1, survival)
           lifetimes <- apply(survival, 1, FUN=function(x){
                z <- diff(x < runif(1))
                r <- ifelse(all(z==0), T, which.max(z))
