@@ -150,6 +150,20 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
                warning(paste(r, c("additional observations right-censored because the user-supplied hazard function
                                   is nonzero at the latest timepoint. To avoid these extra censored observations, increase T")))
           }
+          if(!is.null(beta)){
+               exp.low <- baseline$failure.cdf[1]*N
+               exp.hi <- baseline$survivor[T-1]*N
+               obs.low <- sum(data$y==1)
+               obs.hi <- sum(data$y==T)
+               if((obs.hi + obs.low) > 1.2*(exp.hi + exp.lo)){
+                    warning(paste(c(obs.hi + obs.lo, "observations have drawn durations
+                                    at the minimum or maximum possible value. Generating coefficients
+                                    and other quantities of interest are unlikely to be returned
+                                    by models due to truncation. Consider making user-supplied coefficients
+                                    smaller, making T bigger, or decreasing the variance of the X variables."),
+                                  collapse = " "))
+               }
+          }
           return(list(data = data,
                       xdata = xdata,
                       baseline=baseline,
