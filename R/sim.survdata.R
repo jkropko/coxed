@@ -151,12 +151,12 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
                                   is nonzero at the latest timepoint. To avoid these extra censored observations, increase T")))
           }
           if(!is.null(beta)){
-               exp.low <- baseline$failure.cdf[1]*N
+               exp.low <- baseline$failure.CDF[1]*N
                exp.hi <- baseline$survivor[T-1]*N
                obs.low <- sum(data$y==1)
                obs.hi <- sum(data$y==T)
-               if((obs.hi + obs.low) > 1.2*(exp.hi + exp.lo)){
-                    warning(paste(c(obs.hi + obs.lo, "observations have drawn durations
+               if((obs.hi + obs.low) > 1.2*(exp.hi + exp.low)){
+                    warning(paste(c(obs.hi + obs.low, "observations have drawn durations
                                     at the minimum or maximum possible value. Generating coefficients
                                     and other quantities of interest are unlikely to be returned
                                     by models due to truncation. Consider making user-supplied coefficients
