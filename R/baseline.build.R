@@ -36,7 +36,7 @@ baseline.build <- function(T=100, knots = 8, spline = TRUE){
   baseline <- data.frame(time = time[-(T+1)],
                          failure.PDF = diff(bl.failure.CDF),
                          failure.CDF = bl.failure.CDF[-1],
-                         survivor = 1 - bl.failure.CDF[-1])
+                         survivor = abs(1 - bl.failure.CDF[-1]))
   baseline$hazard <-baseline$failure.PDF/(1 - bl.failure.CDF[-(T+1)])
   return(baseline)
 }

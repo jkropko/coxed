@@ -1,4 +1,11 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+coxed 0.3.1
+===========
+
+-   fixed a bug that led to (very close to 0) negative values of the
+    survivor function when the random spline failure CDF reaches 1 prior
+    to the final time point
+
 coxed 0.3.0
 ===========
 
