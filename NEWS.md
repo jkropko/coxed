@@ -1,4 +1,10 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+coxed 0.3.2
+===========
+
+-   fixed a bug that prevented the vignettes from being compiled on
+    windows machines
+
 coxed 0.3.1
 ===========
 
