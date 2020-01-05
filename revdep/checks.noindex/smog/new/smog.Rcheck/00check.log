@@ -1,0 +1,21 @@
+* using log directory ‘/Users/jk8sd/Dropbox/CPH Expected Durations/R Package/coxed/revdep/checks.noindex/smog/new/smog.Rcheck’
+* using R version 3.6.1 (2019-07-05)
+* using platform: x86_64-apple-darwin15.6.0 (64-bit)
+* using session charset: UTF-8
+* using options ‘--no-manual --no-build-vignettes’
+* checking for file ‘smog/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘smog’ version ‘2.0’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘smog’ can be installed ... ERROR
+Installation failed.
+See ‘/Users/jk8sd/Dropbox/CPH Expected Durations/R Package/coxed/revdep/checks.noindex/smog/new/smog.Rcheck/00install.out’ for details.
+* DONE
+Status: 1 ERROR
