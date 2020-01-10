@@ -9,7 +9,7 @@ Depends: R (>= 3.5.0),
 Authors@R: c(
     person("Kropko,", "Jonathan", email = "jkropko@virginia.edu", role = c("aut", "cre")),
     person("Harden,", "Jeffrey J.", email = "jeff.harden@nd.edu", role = c("aut")))
-Description: Functions for generating, simulating, and visualizing expected durations and marginal changes in duration from the Cox proportional hazards model as described in Kropko and Harden (2017) <https://doi.org/10.1017/S000712341700045X> and Harden and Kropko (2018) <https://doi.org/10.1017/psrm.2018.19>.
+Description: Functions for generating, simulating, and visualizing expected durations and marginal changes in duration from the Cox proportional hazards model as described in Kropko and Harden (2017) <doi:10.1017/S000712341700045X> and Harden and Kropko (2018) <doi:10.1017/psrm.2018.19>.
 License: GPL-2
 Encoding: UTF-8
 URL: https://github.com/jkropko/coxed
