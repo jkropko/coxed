@@ -1,4 +1,10 @@
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please edit this file -->
+coxed 0.3.3
+===========
+
+-   changed the call to `rms::cph()` to work with recent changes to the
+    `rms` package
+
 coxed 0.3.2
 ===========
 

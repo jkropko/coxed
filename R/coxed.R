@@ -210,19 +210,21 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
      }
 
      if(bootstrap){
-          if(!tvc) boot.model <- bootcov2(rms::cph(Surv(as.numeric(cox.model$y[ , 1]),
-                                                        as.numeric(cox.model$y[ , 2]),
-                                                        type = "right") ~
-                                                        model.matrix(cox.model),
-                                                   x = TRUE, y = TRUE), B = B, ...)
+          if(!tvc){
+                  S <- Surv(as.numeric(cox.model$y[ , 1]),
+                            as.numeric(cox.model$y[ , 2]),
+                            type = "right")
+                  Xmat <- model.matrix(cox.model)
+                  boot.model <- bootcov2(rms::cph(S ~ Xmat, x = TRUE, y = TRUE), B = B, ...)
+          }
           if(tvc){
                id <- id[as.numeric(rownames(model.frame(cox.model)))]
-               boot.cph <- rms::cph(Surv(as.numeric(cox.model$y[ , 1]),
-                                         as.numeric(cox.model$y[ , 2]),
-                                         as.numeric(cox.model$y[ , 3]),
-                                         type = "counting") ~
-                                         model.matrix(cox.model),
-                                    x = TRUE, y = TRUE)
+               S <- Surv(as.numeric(cox.model$y[ , 1]),
+                         as.numeric(cox.model$y[ , 2]),
+                         as.numeric(cox.model$y[ , 3]),
+                         type = "counting")
+               Xmat <- model.matrix(cox.model)
+               boot.cph <- rms::cph(S ~ X, x = TRUE, y = TRUE)
                class(boot.cph) <- "tvc"
                boot.model <- bootcov2(boot.cph, B = B, cluster=id, ...)
           }
