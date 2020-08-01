@@ -31,7 +31,7 @@
 #' simdata <- sim.survdata(N=1000, T=100, num.data.frames=1)
 #' survsim.plot(simdata)
 #' @export
-#' @seealso \code{\link[coxed]{sim.survdata}}, \code{\link[ggplot2]{ggplot}}, \code{\link[gridExtra]{grid.arrange}}
+#' @seealso \code{\link[coxed]{sim.survdata}}, \code{\link[ggplot2]{ggplot}}, \code{\link[gridExtra:arrangeGrob]{grid.arrange}}
 survsim.plot <- function(survsim, type="both", bins=30, df=1){
      stopifnot(inherits(survsim, "simSurvdata"))
      if(!is.null(type) & !(type %in% c("baseline", "hist", "both")))

@@ -7,7 +7,7 @@
 #' function
 #' @details This function reshapes the data for easy faceting with \code{\link[ggplot2]{facet_wrap}} within
 #' a call to \code{\link[ggplot2]{ggplot}}. Each function is plotted on the y-axis and time is plotted on
-#' the x-axis using \code{\link[ggplot2]{geom_line}}
+#' the x-axis using \code{\link[ggplot2:geom_path]{geom_line}}
 #' @return A figure of class \code{"gg"} and \code{"ggplot"}
 #' @export
 #' @author Jonathan Kropko <jkropko@@virginia.edu> and Jeffrey J. Harden <jharden2@@nd.edu>

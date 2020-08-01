@@ -21,7 +21,7 @@ This function is called by \code{\link[coxed]{survsim.plot}} and is not intended
 \details{
 This function reshapes the data for easy faceting with \code{\link[ggplot2]{facet_wrap}} within
 a call to \code{\link[ggplot2]{ggplot}}. Each function is plotted on the y-axis and time is plotted on
-the x-axis using \code{\link[ggplot2]{geom_line}}
+the x-axis using \code{\link[ggplot2:geom_path]{geom_line}}
 }
 \examples{
 simdata <- sim.survdata(N=1000, T=100, num.data.frames=1)

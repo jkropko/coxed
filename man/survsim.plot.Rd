@@ -50,7 +50,7 @@ Harden, J. J. and Kropko, J. (2018). Simulating Duration Data for the Cox Model.
 \emph{Political Science Research and Methods} \url{https://doi.org/10.1017/psrm.2018.19}
 }
 \seealso{
-\code{\link[coxed]{sim.survdata}}, \code{\link[ggplot2]{ggplot}}, \code{\link[gridExtra]{grid.arrange}}
+\code{\link[coxed]{sim.survdata}}, \code{\link[ggplot2]{ggplot}}, \code{\link[gridExtra:arrangeGrob]{grid.arrange}}
 }
 \author{
 Jonathan Kropko <jkropko@virginia.edu> and Jeffrey J. Harden <jharden2@nd.edu>

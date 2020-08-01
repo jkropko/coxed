@@ -19,6 +19,7 @@ Imports: PermAlgo,
     tidyr,
     ggplot2,
     gridExtra,
+    mediation,
     utils
 RoxygenNote: 6.1.1
 Suggests: knitr,

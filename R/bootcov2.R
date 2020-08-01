@@ -50,7 +50,7 @@
 #' function. First, we output a result attribute \code{b.ind}, which contains the observation numbers from the estimation sample
 #' that are drawn with replacement to produce the bootstrap sample and takes into account clustering.
 #' Second, we program a new class, \code{tvc}, for
-#' \code{fitter} to use \code{\link[survival]{agreg.fit}} instead of \code{\link[survival]{coxph.fit}}
+#' \code{fitter} to use \code{\link[survival]{agreg.fit}} instead of \code{\link[survival:agreg.fit]{coxph.fit}}
 #' when the data contain time-varying covariates.
 #'
 #' @seealso \code{\link[coxed]{coxed}}, \code{\link[survival]{coxph}}, \code{\link[rms]{cph}}, \code{\link[rms]{bootcov}}
