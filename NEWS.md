@@ -1,4 +1,12 @@
 <!-- README.md is generated from README.Rmd. Please edit this file -->
+coxed 0.3.4
+===========
+
+-   changed the method through which the `sim.survdata()` function warns
+    users that their linear predictor is too large to produce good
+    results, and should reduce the size of the beta coefficients, and
+    changed the text of the warning
+
 coxed 0.3.3
 ===========
 

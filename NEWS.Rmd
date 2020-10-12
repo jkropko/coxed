@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+# coxed 0.3.4
+
+* changed the method through which the `sim.survdata()` function warns users that their linear predictor is too large to produce good results, and should reduce the size of the beta coefficients, and changed the text of the warning
+
 # coxed 0.3.3
 
 * changed the call to `rms::cph()` to work with recent changes to the `rms` package

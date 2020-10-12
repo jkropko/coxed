@@ -155,11 +155,14 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
                exp.hi <- baseline$survivor[T-1]*N
                obs.low <- sum(data$y==1)
                obs.hi <- sum(data$y==T)
-               if((obs.hi + obs.low) > 1.2*(exp.hi + exp.low)){
+               p.low <- 1 - pbinom(obs.low, size=N, p=baseline$failure.CDF[1])
+               p.high <- 1 - pbinom(obs.hi, size=N, p=baseline$survivor[T-1])
+               if(p.low < .05 | p.high < .05){
                     warning(paste(c(obs.hi + obs.low, "observations have drawn durations
-                                    at the minimum or maximum possible value. Generating coefficients
-                                    and other quantities of interest are unlikely to be returned
-                                    by models due to truncation. Consider making user-supplied coefficients
+                                    at the minimum or maximum possible value. The linear predictor may be
+                                    too large to produce a useable survivor function, and generating coefficients
+                                    and other quantities of interest are unlikely to be returned.
+                                    Consider making user-supplied coefficients
                                     smaller, making T bigger, or decreasing the variance of the X variables."),
                                   collapse = " "))
                }
