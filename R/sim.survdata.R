@@ -25,7 +25,7 @@
 #' the cumulative baseline hazard is specified as a step function with steps at the knots. Ignored if \code{hazard.fun} is not \code{NULL}
 #' @param X A user-specified data frame containing the covariates that condition duration. If \code{NULL}, covariates are generated from
 #' normal distributions with means given by the \code{mu} argument and standard deviations given by the \code{sd} argument
-#' @param beta Either a user-specified vector containing the coefficients that for the linear part of the duration model, or
+#' @param beta Either a user-specified vector containing the coefficients for the linear part of the duration model, or
 #' a user specified matrix with rows equal to \code{T} for pre-specified time-varying coefficients.
 #' If \code{NULL}, coefficients are generated from normal distributions with means of 0 and standard deviations of 0.1
 #' @param xvars The number of covariates to generate. Ignored if \code{X} is not \code{NULL}

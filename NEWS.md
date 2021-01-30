@@ -1,4 +1,12 @@
 <!-- README.md is generated from README.Rmd. Please edit this file -->
+coxed 0.3.5
+===========
+
+-   fixed a bug that occurred with sim.survdata() with type=‘tvbeta’,
+    user-specified coefficients, and one covariate. Collapsed the
+    separate code for the one covariate case into the more than one
+    covariate case by coercing beta into a matrix so that ncol() works.
+
 coxed 0.3.4
 ===========
 

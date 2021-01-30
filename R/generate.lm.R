@@ -105,19 +105,19 @@ generate.lm <- function(baseline, X=NULL, N=1000, type="none", beta=NULL, xvars=
      } else if(type=="tvbeta"){
           X <- cbind(matrix(rnorm(N*xvars, mean=mu, sd=sd), N, xvars))
           if(is.null(beta)) beta <- as.matrix(rnorm(ncol(X), mean=0, sd=.1))
-          if(!is.null(beta) & ncol(beta) == 1){
-               beta.mat1 <- data.frame(time = 1:T, one=1)
-               beta.mat2 <- data.frame(t(beta), one=1)
-               beta.mat <- merge(beta.mat1, beta.mat2, by="one")
-               beta.mat <- dplyr::select(beta.mat, -one)
-               colnames(beta.mat) <- gsub(pattern="X", replacement="beta", colnames(beta.mat))
-               beta.mat <- dplyr::mutate(beta.mat, beta1 = beta1*log(time))
-               beta.mat2 <- dplyr::select(beta.mat, -time)
-               XB <- apply(as.matrix(beta.mat2), 1, FUN=function(b){
-                    as.matrix(X)%*%b
-               })
-          }
-          if(!is.null(beta) & ncol(beta) > 1){
+          # if(!is.null(beta) & ncol(beta) == 1){
+          #      beta.mat1 <- data.frame(time = 1:T, one=1)
+          #      beta.mat2 <- data.frame(X1=t(beta), one=1)
+          #      beta.mat <- merge(beta.mat1, beta.mat2, by="one")
+          #      beta.mat <- dplyr::select(beta.mat, -one)
+          #      colnames(beta.mat) <- gsub(pattern="X", replacement="beta", colnames(beta.mat))
+          #      beta.mat <- dplyr::mutate(beta.mat, beta1 = beta1*log(time))
+          #      beta.mat2 <- dplyr::select(beta.mat, -time)
+          #      XB <- apply(as.matrix(beta.mat2), 1, FUN=function(b){
+          #           as.matrix(X)%*%b
+          #      })
+          # }
+          if(!is.null(beta)){#if(!is.null(beta) & ncol(beta) > 1){
                XB <- apply(as.matrix(beta), 1, FUN=function(b){
                     as.matrix(X)%*%b
                })
