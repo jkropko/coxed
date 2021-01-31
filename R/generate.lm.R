@@ -103,26 +103,28 @@ generate.lm <- function(baseline, X=NULL, N=1000, type="none", beta=NULL, xvars=
           rownames(data) <- NULL
           tvc <- TRUE
      } else if(type=="tvbeta"){
-          X <- cbind(matrix(rnorm(N*xvars, mean=mu, sd=sd), N, xvars))
-          if(is.null(beta)) beta <- as.matrix(rnorm(ncol(X), mean=0, sd=.1))
-          # if(!is.null(beta) & ncol(beta) == 1){
-          #      beta.mat1 <- data.frame(time = 1:T, one=1)
-          #      beta.mat2 <- data.frame(X1=t(beta), one=1)
-          #      beta.mat <- merge(beta.mat1, beta.mat2, by="one")
-          #      beta.mat <- dplyr::select(beta.mat, -one)
-          #      colnames(beta.mat) <- gsub(pattern="X", replacement="beta", colnames(beta.mat))
-          #      beta.mat <- dplyr::mutate(beta.mat, beta1 = beta1*log(time))
-          #      beta.mat2 <- dplyr::select(beta.mat, -time)
-          #      XB <- apply(as.matrix(beta.mat2), 1, FUN=function(b){
-          #           as.matrix(X)%*%b
-          #      })
-          # }
-          if(!is.null(beta)){#if(!is.null(beta) & ncol(beta) > 1){
-               XB <- apply(as.matrix(beta), 1, FUN=function(b){
-                    as.matrix(X)%*%b
-               })
-               beta.mat <- cbind(time=1:nrow(beta), beta)
+          X <- matrix(rnorm(N*xvars, mean=mu, sd=sd), N, xvars)
+          if(is.data.frame(beta)) beta <- as.matrix(beta)
+          if(!is.null(beta) & is.matrix(beta)){
+                  d <- dim(beta)
+                  if(d[1] != T) stop("User specified coefficients with type='tvbeta' must be specified either once, or for all T time points")
+                  if(d[2] != xvars) stop("User specified coefficients must be specified for all X variables")
+                  beta.mat <- beta
           }
+          if(!is.null(beta) & !is.matrix(beta)){
+                  if(length(beta)!=xvars) stop("There must be one user-supplied coefficient for each X variable")
+                  beta.mat <- matrix(rep(beta, T), T, length(beta), byrow = TRUE)
+                  beta.mat[,1] <- beta.mat[,1]*log(1:T)
+          }
+          if(is.null(beta)){
+                  beta <- rnorm(ncol(X), mean=0, sd=.1)
+                  beta.mat <- matrix(rep(beta, T), T, length(beta), byrow = TRUE)
+                  beta.mat[,1] <- beta.mat[,1]*log(1:T)
+          }
+
+          XB <- apply(beta.mat, 1, FUN = function(b){
+                  return(X %*% b)
+          })
           survival <- t(apply(XB, 1, FUN=function(x){baseline$survivor^exp(x)}))
           survival <- cbind(1, survival)
           lifetimes <- apply(survival, 1, FUN=function(x){

@@ -39,47 +39,50 @@
 #' me$marg.effect
 make.margeffect <- function(baseline, xb, covariate=1, low=0, high=1, compare=median){
 
-     if(xb$tvc){
-          X0 <- dplyr::select(xb$data, -id, -failed, -start, -end)
-          X1 <- dplyr::select(xb$data, -id, -failed, -start, -end)
-     } else {
-          X0 <- dplyr::select(xb$data, -y)
-          X1 <- dplyr::select(xb$data, -y)
-     }
+        if(xb$tvc){
+                X0 <- dplyr::select(xb$data, -id, -failed, -start, -end)
+                X1 <- dplyr::select(xb$data, -id, -failed, -start, -end)
+        } else {
+                X0 <- dplyr::select(xb$data, -y)
+                X1 <- dplyr::select(xb$data, -y)
+        }
 
-     X0[,covariate] <- low
-     X1[,covariate] <- high
+        X0[,covariate] <- low
+        X1[,covariate] <- high
 
-     beta <- xb$beta
-     if(ncol(beta) > 1) beta <- beta[,-1]
+        beta <- xb$beta
 
-     if(ncol(as.matrix(beta)) == 1){
-          XB0 <- as.matrix(X0)%*%beta
-          survival <- t(sapply(XB0, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
-     } else {
-          XB0 <- as.matrix(X0)%*%t(as.matrix(beta))
-          survival <- t(apply(XB0, 1, FUN=function(x){baseline$survivor^exp(x)}))
-     }
-     y0 <- apply(survival, 1, FUN=function(x){
-          which.max(diff(x < runif(1)))
-     })
+        if(ncol(as.matrix(beta)) == 1){
+                XB0 <- as.matrix(X0)%*%beta
+                survival <- t(sapply(XB0, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
+        } else {
+                XB0 <- apply(beta, 1, FUN = function(b){
+                        return(as.matrix(X0) %*% b)
+                })
+                survival <- t(apply(XB0, 1, FUN=function(x){baseline$survivor^exp(x)}))
+        }
+        y0 <- apply(survival, 1, FUN=function(x){
+                which.max(diff(x < runif(1)))
+        })
 
-     if(ncol(as.matrix(beta)) == 1){
-          XB1 <- as.matrix(X1)%*%beta
-          survival <- t(sapply(XB1, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
-     } else {
-          XB1 <- as.matrix(X1)%*%t(as.matrix(beta))
-          survival <- t(apply(XB1, 1, FUN=function(x){baseline$survivor^exp(x)}))
-     }
-     y1 <- apply(survival, 1, FUN=function(x){
-          which.max(diff(x < runif(1)))
-     })
+        if(ncol(as.matrix(beta)) == 1){
+                XB1 <- as.matrix(X1)%*%beta
+                survival <- t(sapply(XB1, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
+        } else {
+                XB1 <- apply(beta, 1, FUN = function(b){
+                        return(as.matrix(X1) %*% b)
+                })
+                survival <- t(apply(XB1, 1, FUN=function(x){baseline$survivor^exp(x)}))
+        }
+        y1 <- apply(survival, 1, FUN=function(x){
+                which.max(diff(x < runif(1)))
+        })
 
-     marg.effect <- compare(y1 - y0)
-     data.low <- list(x = X0, y = y0)
-     data.high <- list(x = X1, y = y1)
+        marg.effect <- compare(y1 - y0)
+        data.low <- list(x = X0, y = y0)
+        data.high <- list(x = X1, y = y1)
 
-     return(list(marg.effect = marg.effect,
-                 data.low = data.low,
-                 data.high = data.high))
+        return(list(marg.effect = marg.effect,
+                    data.low = data.low,
+                    data.high = data.high))
 }

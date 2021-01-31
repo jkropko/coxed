@@ -115,7 +115,7 @@ summary(simdata$data)
 ## User-supplied coefficients
 By default the coefficients are drawn from normal distributions, however the user may specify different coefficients with the `beta` argument if he or she wishes: 
 ```{r simsurv1part2}
-simdata <- sim.survdata(N=1000, T=100, num.data.frames=1, beta=c(1, -1.5, 2))
+simdata <- sim.survdata(N=1000, T=500, num.data.frames=1, beta=c(.5, -.75, 1))
 simdata$betas
 ```
 Another way that a user can specify coefficients is to let these coefficients be dependent on time. An example of that is provided below.
