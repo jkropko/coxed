@@ -46,8 +46,8 @@
 #' a hazard that does not necessarily conform to any parametric hazard function. It can generate data with time-varying
 #' covariates or coefficients. For time-varying covariates \code{type="tvc"} it employs the permutational algorithm by Sylvestre and Abrahamowicz (2008).
 #' For time-varying coefficients with \code{type="tvbeta"}, the user pre-specify either a matrix of time-dependent coefficients with the \code{beta} argument, a vector
-#' of coefficients with the \code{beta} argument, or may choose not to pre-specify any coefficients by leaving \code{beta} as \code{NULL}.
-#' If the user specifies a matrix, the dimensions of the matrix must be \code{T} by \code{xvars}, the number of time points
+#' of coefficients with the \code{beta} argument, or may choose to have coefficients drawn from random normal draws by leaving \code{beta} as \code{NULL}.
+#' If the user specifies a matrix, the dimensions of the matrix must be \code{T} by \code{xvars}: the number of time points
 #' by the number of X variables. If the user specifies a vector, or if the \code{beta} argument is \code{NULL}, the first beta coefficient
 #' is multiplied by the natural log of the failure time under consideration.
 #'
