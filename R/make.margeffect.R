@@ -52,8 +52,8 @@ make.margeffect <- function(baseline, xb, covariate=1, low=0, high=1, compare=me
 
         beta <- xb$beta
 
-        if(ncol(as.matrix(beta)) == 1){
-                XB0 <- as.matrix(X0)%*%beta
+        if(nrow(as.matrix(beta)) == 1){
+                XB0 <- as.matrix(X0)%*% beta
                 survival <- t(sapply(XB0, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
         } else {
                 XB0 <- apply(beta, 1, FUN = function(b){
@@ -65,7 +65,7 @@ make.margeffect <- function(baseline, xb, covariate=1, low=0, high=1, compare=me
                 which.max(diff(x < runif(1)))
         })
 
-        if(ncol(as.matrix(beta)) == 1){
+        if(nrow(as.matrix(beta)) == 1){
                 XB1 <- as.matrix(X1)%*%beta
                 survival <- t(sapply(XB1, FUN=function(x){baseline$survivor^exp(x)}, simplify=TRUE))
         } else {
