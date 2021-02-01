@@ -150,7 +150,7 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
           if(!is.null(hazard.fun)){
                data$failed[data$y==T] <- TRUE
                r <- sum(data$y==T)
-               warning(paste(r, c("additional observations right-censored because the user-supplied hazard function
+               if(r > .05*N) warning(paste(r, c("additional observations right-censored because the user-supplied hazard function
                                   is nonzero at the latest timepoint. To avoid these extra censored observations, increase T")))
           }
           if(!is.null(beta)){
