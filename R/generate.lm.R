@@ -103,7 +103,8 @@ generate.lm <- function(baseline, X=NULL, N=1000, type="none", beta=NULL, xvars=
           rownames(data) <- NULL
           tvc <- TRUE
      } else if(type=="tvbeta"){
-          X <- matrix(rnorm(N*xvars, mean=mu, sd=sd), N, xvars)
+          if(is.null(X)) X <- matrix(rnorm(N*xvars, mean=mu, sd=sd), N, xvars)
+          if(!is.null(X)) X <- as.matrix(X)
           if(is.data.frame(beta)) beta <- as.matrix(beta)
           if(!is.null(beta) & is.matrix(beta)){
                   d <- dim(beta)

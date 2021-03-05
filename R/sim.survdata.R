@@ -160,7 +160,7 @@ sim.survdata <- function(N=1000, T=100, type="none", hazard.fun = NULL, num.data
                obs.hi <- sum(data$y==T)
                p.low <- 1 - pbinom(obs.low, size=N, p=baseline$failure.CDF[1])
                p.high <- 1 - pbinom(obs.hi, size=N, p=baseline$survivor[T-1])
-               if(p.low < .05 | p.high < .05){
+               if(p.low < .025 | p.high < .025){
                     warning(paste(c(obs.hi + obs.low, "observations have drawn durations
                                     at the minimum or maximum possible value. The linear predictor may be
                                     too large to produce a useable survivor function, and generating coefficients

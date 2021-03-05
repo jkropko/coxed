@@ -1,6 +1,12 @@
 <!-- README.md is generated from README.Rmd. Please edit this file -->
-coxed 0.3.5
+coxed 0.3.7
 ===========
+
+-   fixed a bug with `sim.survdata()` in which user-supplied X matrices
+    are replaced with randomly generated X matrices with `type='tvbeta'`
+
+coxed 0.3.5 and 0.3.6
+=====================
 
 -   fixed a bug that occurred with sim.survdata() with type=‘tvbeta’,
     user-specified coefficients, and one covariate. Collapsed the

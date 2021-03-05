@@ -14,7 +14,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-# coxed 0.3.5
+# coxed 0.3.7
+
+* fixed a bug with `sim.survdata()` in which user-supplied X matrices are replaced with randomly generated X matrices with `type='tvbeta'`
+
+# coxed 0.3.5 and 0.3.6
 
 * fixed a bug that occurred with sim.survdata() with type='tvbeta', user-specified coefficients, and one covariate. Collapsed the separate code for the one covariate case into the more than one covariate case by coercing beta into a matrix so that ncol() works.
 
