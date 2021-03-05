@@ -32,6 +32,17 @@
 #' bca(theta, conf.level = .95)
 
 bca <- function(theta, conf.level = .95){
+
+  if(var(theta)==0){
+    lower <- mean(theta)
+    upper <- mean(theta)
+    return(c(lower, upper))
+  }
+
+  if(max(theta)==Inf | min(theta)==-Inf){
+    stop("bca() function does not work when some values are infinite")
+  }
+
   low <- (1 - conf.level)/2
   high <- 1 - low
   sims <- length(theta)
