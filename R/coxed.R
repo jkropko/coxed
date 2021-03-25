@@ -1,7 +1,7 @@
 #' Expected durations and marginal changes in expected duration from the
 #' Cox proportional hazards model
 #'
-#' \code{coxed()} returns expected durations for every observation in the data
+#' \code{coxed()} returns the expected durations for every observation in the data
 #' used to fit the model, or in new data, or returns the mean or median of these
 #' durations, or differences in duration for two pre-defined covariate profiles.
 #' Standard errors and confidence intervals for all quantities produced by
