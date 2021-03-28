@@ -224,7 +224,7 @@ coxed <- function(cox.model, newdata=NULL, newdata2=NULL, bootstrap=FALSE, metho
                          as.numeric(cox.model$y[ , 3]),
                          type = "counting")
                Xmat <- model.matrix(cox.model)
-               boot.cph <- rms::cph(S ~ X, x = TRUE, y = TRUE)
+               boot.cph <- rms::cph(S ~ Xmat, x = TRUE, y = TRUE)
                class(boot.cph) <- "tvc"
                boot.model <- bootcov2(boot.cph, B = B, cluster=id, ...)
           }
